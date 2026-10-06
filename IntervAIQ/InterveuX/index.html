@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InterveuX — AI-Powered Virtual Interviews</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        .nav-logo-img {
+            width: 120px !important;
+            height: 50px !important;
+            object-fit: contain !important;
+            border-radius: 0 !important;
+            display: block;
+        }
+        .logo-text {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            text-decoration: none;
+        }
+
+        /* ── HERO REDESIGN (InCruiter-style split layout, InterveuX colours) ── */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 6rem 2rem 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        /* Left column */
+        .hero-left {
+            text-align: left;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 1rem;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.25);
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 0.6s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-dot {
+            width: 7px;
+            height: 7px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .hero-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2.2rem, 4.5vw, 3.6rem);
+            font-weight: 800;
+            line-height: 1.12;
+            margin-bottom: 1.25rem;
+            animation: fadeInUp 0.6s ease 0.1s both;
+        }
+
+        .hero-subtitle {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            line-height: 1.75;
+            animation: fadeInUp 0.6s ease 0.2s both;
+            max-width: 520px;
+        }
+
+        .hero-cta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+            animation: fadeInUp 0.6s ease 0.3s both;
+            flex-wrap: wrap;
+        }
+
+        /* Stats row */
+        .hero-stats {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            animation: fadeInUp 0.6s ease 0.4s both;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: left;
+        }
+
+        .stat-number {
+            display: block;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1;
+            margin-bottom: 0.2rem;
+        }
+
+        .stat-label {
+            font-size: 0.78rem;
+            color: var(--text-tertiary);
+        }
+
+        .stat-divider {
+            width: 1px;
+            height: 36px;
+            background: var(--border);
+            flex-shrink: 0;
+        }
+
+        /* Right column — hero image */
+        .hero-right {
+            position: relative;
+            animation: fadeInUp 0.8s ease 0.3s both;
+        }
+
+        .hero-image-wrapper {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 24px 80px rgba(99, 102, 241, 0.25);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .hero-image-wrapper img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 20px;
+        }
+
+        /* Floating badge on image */
+        .hero-float-badge {
+            position: absolute;
+            bottom: -16px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #fff;
+            padding: 0.6rem 1.4rem;
+            border-radius: 100px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            white-space: nowrap;
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        /* Decorative glow behind image */
+        .hero-right::before {
+            content: '';
+            position: absolute;
+            width: 420px;
+            height: 420px;
+            background: radial-gradient(circle, rgba(99,102,241,0.2), transparent 70%);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Responsive hero */
+        @media (max-width: 900px) {
+            .hero-inner {
+                grid-template-columns: 1fr;
+                gap: 2.5rem;
+                text-align: center;
+            }
+            .hero-left { text-align: center; }
+            .hero-subtitle { margin: 0 auto 2rem; }
+            .hero-cta { justify-content: center; }
+            .hero-stats { justify-content: center; }
+            .stat-item { text-align: center; }
+            .hero-right { max-width: 520px; margin: 0 auto; }
+        }
+
+        @media (max-width: 480px) {
+            .hero { padding: 5.5rem 1rem 3rem; }
+            .hero-title { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-gradient-animated">
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+        <div class="gradient-orb orb-3"></div>
+        <div class="gradient-orb orb-4"></div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <img src="assets/logo.png" alt="InterveuX" class="nav-logo-img" style="width:120px;height:50px;object-fit:contain;border-radius:0">
+            </a>
+            <div class="nav-links" id="navLinks">
+                <a href="#home" class="nav-link active">Home</a>
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#how-it-works" class="nav-link">How It Works</a>
+                <a href="#about" class="nav-link">About</a>
+                <a href="#contact" class="nav-link">Contact</a>
+            </div>
+            <div class="nav-actions">
+                <a href="login.html" class="btn-ghost" id="loginBtn">Log In</a>
+                <a href="signup.html" class="btn-primary" id="signupBtn">Get Started</a>
+                <a href="dashboard.html" class="btn-primary" id="dashboardBtn" style="display:none;">Dashboard</a>
+                <button class="btn-icon" id="themeToggle" aria-label="Toggle theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ═══════════════════════════════════════════════
+         HERO SECTION — InCruiter-style split layout
+         ═══════════════════════════════════════════════ -->
+    <section class="hero" id="home">
+        <div class="hero-inner">
+
+            <!-- LEFT: Text content -->
+            <div class="hero-left">
+                <div class="hero-badge">
+                    <span class="badge-dot"></span>
+                    Next-Gen AI Interview Platform
+                </div>
+
+                <h1 class="hero-title">
+                    Master Your Interviews<br>
+                    <span class="gradient-text">With AI Precision</span>
+                </h1>
+
+                <p class="hero-subtitle">
+                    Experience realistic AI-powered mock interviews with real-time emotion detection,
+                    posture analysis, and intelligent feedback. Your path to interview excellence starts here.
+                </p>
+
+                <div class="hero-cta">
+                    <a href="signup.html" class="btn-primary btn-lg">
+                        <span>Start Free Interview</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <button class="btn-outline btn-lg" id="watchDemoBtn">
+                        <i class="fas fa-play-circle"></i>
+                        <span>Watch Demo</span>
+                    </button>
+                </div>
+
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">Live AI</span>
+                        <span class="stat-label">Emotion & Posture Tracking</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <span class="stat-number">Role-Based</span>
+                        <span class="stat-label">Specific Questions</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <span class="stat-number">Instant</span>
+                        <span class="stat-label">AI Feedback Report</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: Hero promotional image -->
+            <div class="hero-right">
+                <div class="hero-image-wrapper">
+                    <img src="assets/hero-banner.png" alt="InterveuX AI Mock Interview — candidate facing AI robot interviewer">
+                </div>
+                <div class="hero-float-badge">
+                    <i class="fas fa-circle" style="font-size:0.5rem;opacity:0.8;animation:pulse 1.5s infinite"></i>
+                    AI Interview Session Live
+                </div>
+            </div>
+
+        </div>
+    </section>
+    <!-- ═══════════════════ END HERO ═══════════════════ -->
+
+    <!-- Features Section -->
+    <section class="features-section" id="features">
+        <div class="section-container">
+            <div class="section-header">
+                <span class="section-badge">Features</span>
+                <h2 class="section-title">Everything You Need to<br><span class="gradient-text">Ace Your Interview</span></h2>
+                <p class="section-subtitle">Powered by cutting-edge AI technology for the most realistic interview preparation experience.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card glass-card">
+                    <div class="feature-icon">
+                        <div class="icon-bg purple"><i class="fas fa-robot"></i></div>
+                    </div>
+                    <h3>AI Avatar Interviewer</h3>
+                    <p>Realistic AI avatar with natural speech, lip-sync animation, and human-like conversational flow.</p>
+                </div>
+                <div class="feature-card glass-card">
+                    <div class="feature-icon">
+                        <div class="icon-bg blue"><i class="fas fa-brain"></i></div>
+                    </div>
+                    <h3>Smart Question Engine</h3>
+                    <p>AI-generated questions tailored to your role, experience level, and industry using advanced LLMs.</p>
+                </div>
+                <div class="feature-card glass-card">
+                    <div class="feature-icon">
+                        <div class="icon-bg indigo"><i class="fas fa-face-smile"></i></div>
+                    </div>
+                    <h3>Emotion Detection</h3>
+                    <p>Real-time facial expression analysis tracking confidence, nervousness, and engagement levels.</p>
+                </div>
+                <div class="feature-card glass-card">
+                    <div class="feature-icon">
+                        <div class="icon-bg violet"><i class="fas fa-microphone"></i></div>
+                    </div>
+                    <h3>Voice Analysis</h3>
+                    <p>Evaluate speaking speed, fluency, hesitation patterns, and overall communication quality.</p>
+                </div>
+                <div class="feature-card glass-card">
+                    <div class="feature-icon">
+                        <div class="icon-bg pink"><i class="fas fa-person"></i></div>
+                    </div>
+                    <h3>Posture Monitoring</h3>
+                    <p>AI-powered body language analysis ensuring professional presentation throughout interviews.</p>
+                </div>
+                <div class="feature-card glass-card">
+                    <div class="feature-icon">
+                        <div class="icon-bg teal"><i class="fas fa-chart-line"></i></div>
+                    </div>
+                    <h3>Detailed Reports</h3>
+                    <p>Comprehensive analytics with scores, feedback, strengths, weaknesses, and improvement roadmap.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="section-container">
+            <div class="section-header">
+                <span class="section-badge">Process</span>
+                <h2 class="section-title">How <span class="gradient-text">InterveuX</span> Works</h2>
+                <p class="section-subtitle">Get interview-ready in just four simple steps.</p>
+            </div>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">01</div>
+                    <div class="step-icon"><i class="fas fa-user-plus"></i></div>
+                    <h3>Create Account</h3>
+                    <p>Sign up in seconds and set up your professional profile with your target role and experience.</p>
+                </div>
+                <div class="step-connector"><i class="fas fa-arrow-right"></i></div>
+                <div class="step-card">
+                    <div class="step-number">02</div>
+                    <div class="step-icon"><i class="fas fa-sliders"></i></div>
+                    <h3>Configure Interview</h3>
+                    <p>Choose interview type, difficulty level, industry, and specific topics to practice.</p>
+                </div>
+                <div class="step-connector"><i class="fas fa-arrow-right"></i></div>
+                <div class="step-card">
+                    <div class="step-number">03</div>
+                    <div class="step-icon"><i class="fas fa-video"></i></div>
+                    <h3>Start Interview</h3>
+                    <p>Face the AI avatar interviewer with your camera and microphone for a realistic experience.</p>
+                </div>
+                <div class="step-connector"><i class="fas fa-arrow-right"></i></div>
+                <div class="step-card">
+                    <div class="step-number">04</div>
+                    <div class="step-icon"><i class="fas fa-file-lines"></i></div>
+                    <h3>Get AI Report</h3>
+                    <p>Receive comprehensive feedback with scores, analysis, and personalized improvement tips.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about-section" id="about">
+        <div class="section-container">
+            <div class="about-grid">
+                <div class="about-content">
+                    <span class="section-badge">About</span>
+                    <h2 class="section-title">Built by <span class="gradient-text">Anushka Singh</span></h2>
+                    <p>InterveuX combines artificial intelligence, computer vision, and natural language processing to create a realistic interview preparation platform that runs entirely in your browser.</p>
+                    <p>Built as a full-stack AI project to solve a real problem — affordable, honest interview prep with detailed feedback that was previously only available through expensive human coaches.</p>
+                    <div class="about-features">
+                        <div class="about-feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Role-specific AI question generation</span>
+                        </div>
+                        <div class="about-feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Real-time emotion & posture detection</span>
+                        </div>
+                        <div class="about-feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Female AI voice interviewer by default</span>
+                        </div>
+                        <div class="about-feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Data stays local — privacy first</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-visual">
+                    <div class="about-card glass-card">
+                        <div class="about-metric">
+                            <i class="fas fa-robot"></i>
+                            <h3>AI</h3>
+                            <p>Avatar Interviewer</p>
+                        </div>
+                    </div>
+                    <div class="about-card glass-card">
+                        <div class="about-metric">
+                            <i class="fas fa-face-smile"></i>
+                            <h3>Live</h3>
+                            <p>Emotion Detection</p>
+                        </div>
+                    </div>
+                    <div class="about-card glass-card">
+                        <div class="about-metric">
+                            <i class="fas fa-file-lines"></i>
+                            <h3>Instant</h3>
+                            <p>AI Feedback Reports</p>
+                        </div>
+                    </div>
+                    <div class="about-card glass-card">
+                        <div class="about-metric">
+                            <i class="fas fa-shield-halved"></i>
+                            <h3>Local</h3>
+                            <p>Data in Your Browser</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="section-container">
+            <div class="cta-card glass-card">
+                <h2>Ready to Transform Your<br><span class="gradient-text">Interview Skills?</span></h2>
+                <p>Practice with InterveuX — your AI interview bot — and walk into every interview with confidence.</p>
+                <a href="signup.html" class="btn-primary btn-lg">
+                    <span>Get Started Free</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section" id="contact">
+        <div class="section-container">
+            <div class="section-header">
+                <span class="section-badge">Contact</span>
+                <h2 class="section-title">Get in <span class="gradient-text">Touch</span></h2>
+                <p class="section-subtitle">Have questions or feedback? I'd love to hear from you.</p>
+            </div>
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <div class="contact-item glass-card">
+                        <i class="fas fa-user"></i>
+                        <div>
+                            <h4>Developer</h4>
+                            <p>Anushka Singh</p>
+                        </div>
+                    </div>
+                    <div class="contact-item glass-card">
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <h4>Email</h4>
+                            <p><a href="mailto:anushkasingh02212@gmail.com" style="color:var(--primary)">anushkasingh02212@gmail.com</a></p>
+                        </div>
+                    </div>
+                    <div class="contact-item glass-card">
+                        <i class="fas fa-robot"></i>
+                        <div>
+                            <h4>Platform</h4>
+                            <p>AI Interview Bot — runs entirely in your browser</p>
+                        </div>
+                    </div>
+                </div>
+                <form class="contact-form glass-card" id="contactForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" placeholder="Your name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" placeholder="your@email.com" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Subject</label>
+                        <input type="text" placeholder="Bug report, feature request, or hello" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Message</label>
+                        <textarea rows="4" placeholder="Your message..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary btn-lg">
+                        <span>Send Message</span>
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="index.html" class="nav-logo">
+                        <img src="assets/logo.png" alt="InterveuX" class="nav-logo-img" style="width:120px;height:50px;object-fit:contain;border-radius:0">
+                    </a>
+                    <p>AI-powered interview practice built by Anushka Singh — runs entirely in your browser.</p>
+                    <div class="social-links">
+                        <a href="mailto:anushkasingh02212@gmail.com" title="Email Anushka"><i class="fas fa-envelope"></i></a>
+                        <a href="#" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" title="GitHub"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links-group">
+                    <h4>Platform</h4>
+                    <a href="#features">Features</a>
+                    <a href="#how-it-works">How It Works</a>
+                    <a href="interview.html">Start Interview</a>
+                    <a href="dashboard.html">Dashboard</a>
+                </div>
+                <div class="footer-links-group">
+                    <h4>Account</h4>
+                    <a href="signup.html">Sign Up</a>
+                    <a href="login.html">Log In</a>
+                    <a href="#about">About</a>
+                    <a href="#contact">Contact</a>
+                </div>
+                <div class="footer-links-group">
+                    <h4>Developer</h4>
+                    <a href="mailto:anushkasingh02212@gmail.com">Anushka Singh</a>
+                    <a href="mailto:anushkasingh02212@gmail.com">anushkasingh02212@gmail.com</a>
+                    <a href="#about">About the Project</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>Built by <strong>Anushka Singh</strong> · <a href="mailto:anushkasingh02212@gmail.com" style="color:var(--primary)">anushkasingh02212@gmail.com</a></p>
+                <p>Made with <i class="fas fa-heart" style="color:#ef4444"></i> for interview excellence</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Demo Modal -->
+    <div class="modal-overlay" id="demoModal">
+        <div class="modal-content glass-card">
+            <button class="modal-close" id="closeDemo"><i class="fas fa-times"></i></button>
+            <h3>InterveuX Demo</h3>
+            <div class="demo-video-placeholder">
+                <i class="fas fa-play-circle"></i>
+                <p>Demo video would play here</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="js/firebase.js"></script>
+    <script src="js/utils.js"></script>
+    <script>
+        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+            document.getElementById('navLinks').classList.toggle('active');
+            this.classList.toggle('active');
+        });
+
+        const themeToggle = document.getElementById('themeToggle');
+        const currentTheme = localStorage.getItem('interveux_theme') || 'light';
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        themeToggle.innerHTML = currentTheme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        themeToggle.addEventListener('click', () => {
+            const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('interveux_theme', theme);
+            themeToggle.innerHTML = theme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        });
+
+        window.addEventListener('scroll', () => {
+            document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+        });
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                document.getElementById('navLinks').classList.remove('active');
+            });
+        });
+
+        const featureObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => entry.target.classList.add('visible'), index * 100);
+                }
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.feature-card, .step-card, .testimonial-card').forEach(card => {
+            featureObserver.observe(card);
+        });
+
+        document.getElementById('watchDemoBtn')?.addEventListener('click', () => {
+            document.getElementById('demoModal').classList.add('active');
+        });
+        document.getElementById('closeDemo')?.addEventListener('click', () => {
+            document.getElementById('demoModal').classList.remove('active');
+        });
+        document.getElementById('demoModal')?.addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) e.currentTarget.classList.remove('active');
+        });
+
+        document.getElementById('contactForm')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (typeof showNotification === 'function') {
+                showNotification('Message sent successfully!', 'success');
+            } else {
+                alert('Message sent!');
+            }
+            e.target.reset();
+        });
+
+        if (typeof firebase !== 'undefined' && firebase.auth) {
+            firebase.auth().onAuthStateChanged(user => {
+                if (user) {
+                    document.getElementById('loginBtn').style.display = 'none';
+                    document.getElementById('signupBtn').style.display = 'none';
+                    document.getElementById('dashboardBtn').style.display = 'inline-flex';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

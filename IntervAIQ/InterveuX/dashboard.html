@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — InterveuX</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+/* ── RESET & BASE ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+/* ── OVERVIEW CARDS ── */
+.ov-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:1.25rem;
+    margin-bottom:1.75rem;
+}
+.ov-card{
+    background:var(--bg-secondary,#fff);
+    border:1px solid var(--border,#e2e8f0);
+    border-radius:16px;
+    padding:1.4rem 1.5rem;
+    display:flex;
+    flex-direction:column;
+    gap:.5rem;
+    transition:transform .2s,box-shadow .2s;
+    position:relative;
+    overflow:hidden;
+}
+.ov-card::before{
+    content:'';
+    position:absolute;
+    top:0;left:0;right:0;
+    height:3px;
+    border-radius:16px 16px 0 0;
+}
+.ov-card.purple::before{background:linear-gradient(90deg,#6366f1,#8b5cf6)}
+.ov-card.blue::before{background:linear-gradient(90deg,#3b82f6,#06b6d4)}
+.ov-card.green::before{background:linear-gradient(90deg,#10b981,#34d399)}
+.ov-card.orange::before{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
+.ov-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.ov-top{display:flex;align-items:center;justify-content:space-between}
+.ov-icon{
+    width:40px;height:40px;border-radius:10px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:1rem;color:#fff;
+}
+.ov-icon.purple{background:linear-gradient(135deg,#6366f1,#8b5cf6)}
+.ov-icon.blue{background:linear-gradient(135deg,#3b82f6,#06b6d4)}
+.ov-icon.green{background:linear-gradient(135deg,#10b981,#34d399)}
+.ov-icon.orange{background:linear-gradient(135deg,#f59e0b,#fbbf24)}
+.ov-badge{
+    font-size:.72rem;font-weight:600;
+    padding:.2rem .55rem;border-radius:20px;
+}
+.ov-badge.up{color:#10b981;background:rgba(16,185,129,.1)}
+.ov-badge.neutral{color:#6366f1;background:rgba(99,102,241,.1)}
+.ov-val{
+    font-size:2rem;font-weight:700;
+    font-family:'Space Grotesk',sans-serif;
+    line-height:1;
+}
+.ov-label{font-size:.8rem;color:var(--text-secondary,#64748b);font-weight:500}
+
+/* ── CHART CARDS ── */
+.ch-row{display:grid;grid-template-columns:1.6fr 1fr;gap:1.25rem;margin-bottom:1.75rem}
+.ch-card{
+    background:var(--bg-secondary,#fff);
+    border:1px solid var(--border,#e2e8f0);
+    border-radius:16px;padding:1.4rem 1.5rem;
+}
+.ch-head{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:1.25rem;
+}
+.ch-head h3{font-size:.95rem;font-weight:600}
+.ch-badge{
+    font-size:.72rem;font-weight:600;color:#6366f1;
+    background:rgba(99,102,241,.08);
+    padding:.25rem .65rem;border-radius:20px;
+}
+.ch-empty{
+    display:flex;flex-direction:column;align-items:center;
+    justify-content:center;gap:.5rem;
+    min-height:160px;color:var(--text-secondary,#94a3b8);
+    font-size:.85rem;text-align:center;
+}
+.ch-empty i{font-size:2rem;opacity:.3}
+
+/* ── RECENT LIST ── */
+.rec-card{
+    background:var(--bg-secondary,#fff);
+    border:1px solid var(--border,#e2e8f0);
+    border-radius:16px;padding:1.4rem 1.5rem;
+    margin-bottom:1.75rem;
+}
+.rec-head{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:1.1rem;
+}
+.rec-head h3{font-size:.95rem;font-weight:600}
+.rec-list{display:flex;flex-direction:column;gap:.6rem}
+.rec-item{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:.85rem 1rem;
+    background:var(--bg-primary,#f8fafc);
+    border:1px solid var(--border,#e2e8f0);
+    border-radius:12px;
+    transition:.2s;
+}
+.rec-item:hover{border-color:#6366f1;background:rgba(99,102,241,.02)}
+.rec-left{display:flex;align-items:center;gap:.85rem}
+.rec-ico{
+    width:38px;height:38px;border-radius:9px;
+    display:flex;align-items:center;justify-content:center;font-size:.95rem;
+}
+.rec-ico.hr{background:rgba(99,102,241,.1);color:#6366f1}
+.rec-ico.technical{background:rgba(59,130,246,.1);color:#3b82f6}
+.rec-ico.aptitude{background:rgba(245,158,11,.1);color:#f59e0b}
+.rec-ico.mixed{background:rgba(139,92,246,.1);color:#8b5cf6}
+.rec-name{font-size:.88rem;font-weight:600;margin-bottom:.15rem}
+.rec-meta{font-size:.75rem;color:var(--text-secondary,#64748b)}
+.rec-right{display:flex;align-items:center;gap:1rem}
+.rec-score{
+    font-size:1.15rem;font-weight:700;
+    font-family:'Space Grotesk',sans-serif;
+}
+.score-pill{
+    font-size:.72rem;font-weight:600;
+    padding:.2rem .6rem;border-radius:20px;
+}
+
+/* ── ANALYTICS ── */
+.an-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.75rem}
+.an-card{
+    background:var(--bg-secondary,#fff);
+    border:1px solid var(--border,#e2e8f0);
+    border-radius:16px;padding:1.4rem 1.5rem;
+}
+.an-card.full{grid-column:1/-1}
+.an-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem}
+.an-head h3{font-size:.95rem;font-weight:600}
+
+/* ── SKILLS BARS ── */
+.skills-list{display:flex;flex-direction:column;gap:.85rem}
+.skill-row{display:flex;flex-direction:column;gap:.35rem}
+.skill-top{display:flex;justify-content:space-between;font-size:.82rem}
+.skill-name{font-weight:500}
+.skill-pct{font-weight:700;color:#6366f1}
+.skill-track{height:7px;background:var(--bg-primary,#f1f5f9);border-radius:4px;overflow:hidden}
+.skill-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#6366f1,#8b5cf6);transition:width 1s ease}
+
+/* ── EMPTY STATE ── */
+.empty-state{
+    text-align:center;padding:3rem;
+    color:var(--text-secondary,#94a3b8);
+}
+.empty-state i{font-size:2.5rem;opacity:.3;margin-bottom:.75rem;display:block}
+.empty-state h4{font-size:1rem;color:var(--text-primary,#1e293b);margin-bottom:.4rem}
+.empty-state p{font-size:.85rem;margin-bottom:1.25rem}
+
+/* ── STAT MINI GRID (analytics) ── */
+.mini-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.85rem;margin-bottom:1.25rem}
+.mini-stat{
+    background:var(--bg-primary,#f8fafc);
+    border:1px solid var(--border,#e2e8f0);
+    border-radius:12px;padding:.9rem 1rem;text-align:center;
+}
+.mini-val{
+    font-size:1.4rem;font-weight:700;
+    font-family:'Space Grotesk',sans-serif;color:#6366f1;
+}
+.mini-lbl{font-size:.72rem;color:var(--text-secondary,#64748b);margin-top:.2rem}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1100px){
+    .ov-grid{grid-template-columns:repeat(2,1fr)}
+    .ch-row{grid-template-columns:1fr}
+    .an-grid{grid-template-columns:1fr}
+}
+@media(max-width:640px){
+    .ov-grid{grid-template-columns:1fr 1fr}
+    .mini-stats{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body class="dashboard-body">
+
+<div class="bg-gradient-animated">
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+</div>
+
+<!-- Sidebar -->
+<aside class="sidebar glass-card" id="sidebar">
+    <div class="sidebar-header">
+    <a href="index.html" class="nav-logo">
+        <img src="assets/logo.png" alt="InterveuX"
+             style="width:140px;height:52px;object-fit:contain;border-radius:0;display:block">
+    </a>
+    </div>
+      <nav class="sidebar-nav">
+        <a href="#" class="sidebar-link active" data-section="overview"><i class="fas fa-th-large"></i><span>Overview</span></a>
+        <a href="#" class="sidebar-link" data-section="interviews"><i class="fas fa-video"></i><span>Interviews</span></a>
+        <a href="#" class="sidebar-link" data-section="analytics"><i class="fas fa-chart-bar"></i><span>Analytics</span></a>
+        <a href="#" class="sidebar-link" data-section="reports"><i class="fas fa-file-lines"></i><span>Reports</span></a>
+        <a href="#" class="sidebar-link" data-section="profile"><i class="fas fa-user-circle"></i><span>Profile</span></a>
+        <a href="#" class="sidebar-link" data-section="settings"><i class="fas fa-gear"></i><span>Settings</span></a>
+    </nav>
+    <div class="sidebar-footer">
+        <button class="btn-ghost btn-sm" id="logoutBtn"><i class="fas fa-sign-out-alt"></i><span>Logout</span></button>
+    </div>
+</aside>
+
+<!-- Main -->
+<main class="dashboard-main">
+    <!-- Header -->
+    <header class="dashboard-header glass-card">
+        <button class="mobile-sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+        <div class="header-search">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search interviews, reports...">
+        </div>
+        <div class="header-actions">
+            <button class="btn-icon" id="dashThemeToggle"><i class="fas fa-moon"></i></button>
+            <button class="btn-icon notification-btn">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge">3</span>
+            </button>
+            <div class="user-menu">
+                <div class="user-avatar" id="userAvatar">U</div>
+                <span class="user-name" id="userName">User</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- ══ OVERVIEW ══ -->
+    <section class="dashboard-section active" id="section-overview">
+        <div class="section-top">
+            <div>
+                <h1 class="dashboard-title">Welcome back, <span id="welcomeName">User</span>! 👋</h1>
+                <p class="dashboard-subtitle">Here's your interview performance overview</p>
+            </div>
+            <a href="interview.html" class="btn-primary"><i class="fas fa-plus"></i><span>New Interview</span></a>
+        </div>
+
+        <!-- Stat Cards -->
+        <div class="ov-grid">
+            <div class="ov-card purple">
+                <div class="ov-top">
+                    <div class="ov-icon purple"><i class="fas fa-video"></i></div>
+                    <span class="ov-badge neutral" id="totalBadge">All time</span>
+                </div>
+                <div class="ov-val" id="totalInterviews">0</div>
+                <div class="ov-label">Total Interviews</div>
+            </div>
+            <div class="ov-card blue">
+                <div class="ov-top">
+                    <div class="ov-icon blue"><i class="fas fa-trophy"></i></div>
+                    <span class="ov-badge up" id="scoreBadge">—</span>
+                </div>
+                <div class="ov-val" id="avgScore">0</div>
+                <div class="ov-label">Avg. Score</div>
+            </div>
+            <div class="ov-card green">
+                <div class="ov-top">
+                    <div class="ov-icon green"><i class="fas fa-face-smile"></i></div>
+                    <span class="ov-badge up" id="confBadge">—</span>
+                </div>
+                <div class="ov-val" id="confidenceScore">0%</div>
+                <div class="ov-label">Avg. Confidence</div>
+            </div>
+            <div class="ov-card orange">
+                <div class="ov-top">
+                    <div class="ov-icon orange"><i class="fas fa-clock"></i></div>
+                    <span class="ov-badge neutral">Total</span>
+                </div>
+                <div class="ov-val" id="totalTime">0h</div>
+                <div class="ov-label">Practice Time</div>
+            </div>
+        </div>
+
+        <!-- Charts row -->
+        <div class="ch-row">
+            <div class="ch-card">
+                <div class="ch-head">
+                    <h3>Score History</h3>
+                    <span class="ch-badge" id="chartBadge">Last 10 sessions</span>
+                </div>
+                <div id="perfChartWrap"><canvas id="performanceChart" height="160"></canvas></div>
+                <div class="ch-empty" id="perfEmpty" style="display:none">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Complete interviews to see your score trend</span>
+                </div>
+            </div>
+            <div class="ch-card">
+                <div class="ch-head">
+                    <h3>Skills Breakdown</h3>
+                </div>
+                <div id="skillBarsWrap" class="skills-list"></div>
+                <div class="ch-empty" id="skillEmpty" style="display:none">
+                    <i class="fas fa-sliders"></i>
+                    <span>No skill data yet</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Interviews -->
+        <div class="rec-card">
+            <div class="rec-head">
+                <h3>Recent Interviews</h3>
+                <a href="#" class="view-all-link" data-section="interviews" style="font-size:.85rem;color:#6366f1;font-weight:500">View All</a>
+            </div>
+            <div class="rec-list" id="recentList">
+                <div class="empty-state">
+                    <i class="fas fa-video-slash"></i>
+                    <h4>No interviews yet</h4>
+                    <p>Start your first AI-powered interview to see results here.</p>
+                    <a href="interview.html" class="btn-primary btn-sm">Start Interview</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══ INTERVIEWS ══ -->
+    <section class="dashboard-section" id="section-interviews">
+        <div class="section-top">
+            <div>
+                <h1 class="dashboard-title">My Interviews</h1>
+                <p class="dashboard-subtitle">View and manage all your interview sessions</p>
+            </div>
+            <a href="interview.html" class="btn-primary"><i class="fas fa-plus"></i><span>New Interview</span></a>
+        </div>
+        <div class="setup-card glass-card">
+            <h3>Quick Interview Setup</h3>
+            <div class="setup-grid">
+                <div class="setup-option"><label>Interview Type</label>
+                    <select id="interviewType">
+                        <option value="hr">HR / Behavioral</option>
+                        <option value="technical">Technical</option>
+                        <option value="aptitude">Aptitude</option>
+                        <option value="mixed">Mixed</option>
+                    </select>
+                </div>
+                <div class="setup-option"><label>Difficulty</label>
+                    <select id="difficulty">
+                        <option value="easy">Easy</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </div>
+                <div class="setup-option"><label>Role</label>
+                    <input type="text" id="targetRole" placeholder="e.g., Software Engineer">
+                </div>
+                <div class="setup-option"><label>Questions</label>
+                    <select id="numQuestions">
+                        <option value="5">5 Questions</option>
+                        <option value="10" selected>10 Questions</option>
+                        <option value="15">15 Questions</option>
+                    </select>
+                </div>
+            </div>
+            <a href="interview.html" class="btn-primary btn-lg" id="startInterviewBtn" style="margin-top:1.5rem">
+                <i class="fas fa-play"></i><span>Start Interview</span>
+            </a>
+        </div>
+        <div id="interviewsHistory"></div>
+    </section>
+
+    <!-- ══ ANALYTICS ══ -->
+    <section class="dashboard-section" id="section-analytics">
+        <div class="section-top">
+            <h1 class="dashboard-title">Analytics</h1>
+            <p class="dashboard-subtitle">Deep dive into your performance</p>
+        </div>
+
+        <!-- Mini stats -->
+        <div class="mini-stats">
+            <div class="mini-stat"><div class="mini-val" id="anTotal">0</div><div class="mini-lbl">Interviews Done</div></div>
+            <div class="mini-stat"><div class="mini-val" id="anBest">0</div><div class="mini-lbl">Best Score</div></div>
+            <div class="mini-stat"><div class="mini-val" id="anTime">0h</div><div class="mini-lbl">Total Practice</div></div>
+        </div>
+
+        <div class="an-grid">
+            <!-- Score History -->
+            <div class="an-card full">
+                <div class="an-head"><h3>Score History (All Sessions)</h3></div>
+                <div id="anScoreWrap"><canvas id="anScoreChart" height="120"></canvas></div>
+                <div class="ch-empty" id="anScoreEmpty" style="display:none">
+                    <i class="fas fa-chart-bar"></i><span>No sessions recorded yet</span>
+                </div>
+            </div>
+
+            <!-- Skills -->
+            <div class="an-card">
+                <div class="an-head"><h3>Skills Radar</h3></div>
+                <div id="anRadarWrap"><canvas id="anRadarChart" height="220"></canvas></div>
+                <div class="ch-empty" id="anRadarEmpty" style="display:none">
+                    <i class="fas fa-spider"></i><span>No skill data yet</span>
+                </div>
+            </div>
+
+            <!-- Interview types -->
+            <div class="an-card">
+                <div class="an-head"><h3>Interview Types</h3></div>
+                <div id="anTypeWrap"><canvas id="anTypeChart" height="220"></canvas></div>
+                <div class="ch-empty" id="anTypeEmpty" style="display:none">
+                    <i class="fas fa-chart-pie"></i><span>No data yet</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══ REPORTS ══ -->
+    <section class="dashboard-section" id="section-reports">
+        <div class="section-top">
+            <h1 class="dashboard-title">Reports</h1>
+            <p class="dashboard-subtitle">Download and review your interview reports</p>
+        </div>
+        <div class="reports-list" id="reportsList">
+            <div class="empty-state">
+                <i class="fas fa-file-lines"></i>
+                <h4>No reports yet</h4>
+                <p>Complete an interview to generate your first AI report.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══ PROFILE ══ -->
+    <section class="dashboard-section" id="section-profile">
+        <div class="section-top">
+            <h1 class="dashboard-title">Profile</h1>
+            <p class="dashboard-subtitle">Manage your account details</p>
+        </div>
+        <div class="profile-card glass-card">
+            <div class="profile-header">
+                <div class="profile-avatar" id="profileAvatar">U</div>
+                <div class="profile-info">
+                    <h3 id="profileName">User</h3>
+                    <p id="profileEmail">user@example.com</p>
+                </div>
+            </div>
+            <form class="profile-form" id="profileForm">
+                <div class="form-row">
+                    <div class="form-group"><label>First Name</label><input type="text" id="profileFirstName" placeholder="John"></div>
+                    <div class="form-group"><label>Last Name</label><input type="text" id="profileLastName" placeholder="Doe"></div>
+                </div>
+                <div class="form-group"><label>Target Role</label><input type="text" id="profileRole" placeholder="Software Engineer"></div>
+                <div class="form-group"><label>Experience Level</label>
+                    <select id="profileExperience">
+                        <option value="entry">Entry Level (0-2 years)</option>
+                        <option value="mid">Mid Level (3-5 years)</option>
+                        <option value="senior">Senior Level (5+ years)</option>
+                        <option value="lead">Lead / Manager</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Industry</label>
+                    <select id="profileIndustry">
+                        <option value="tech">Technology</option>
+                        <option value="finance">Finance</option>
+                        <option value="healthcare">Healthcare</option>
+                        <option value="education">Education</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary"><i class="fas fa-save"></i><span>Save Changes</span></button>
+            </form>
+        </div>
+    </section>
+
+    <!-- ══ SETTINGS ══ -->
+    <section class="dashboard-section" id="section-settings">
+        <div class="section-top">
+            <h1 class="dashboard-title">Settings</h1>
+            <p class="dashboard-subtitle">Customize your experience</p>
+        </div>
+        <div class="settings-card glass-card">
+            <div class="setting-group">
+                <div class="setting-info"><h4>Dark Mode</h4><p>Toggle dark theme</p></div>
+                <label class="toggle-switch"><input type="checkbox" id="darkModeToggle"><span class="toggle-slider"></span></label>
+            </div>
+            <div class="setting-group">
+                <div class="setting-info"><h4>AI Voice</h4><p>Choose AI interviewer voice</p></div>
+                <select id="voiceSelect" class="setting-select"><option value="default">Default</option><option value="male">Male</option><option value="female">Female</option></select>
+            </div>
+            <div class="setting-group">
+                <div class="setting-info"><h4>Notifications</h4><p>Email notifications</p></div>
+                <label class="toggle-switch"><input type="checkbox" id="notificationToggle" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div class="setting-group danger">
+                <div class="setting-info"><h4>Delete Account</h4><p>Permanently delete your account and data</p></div>
+                <button class="btn-danger btn-sm" id="deleteAccountBtn">Delete</button>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="js/firebase.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/interview-fix.js"></script>
+
+<script>
+// ══════════════════════════════════════════════
+//  DASHBOARD — reads from localStorage directly
+//  No Firebase required for display
+// ══════════════════════════════════════════════
+
+const DB = {
+    // Read interviews: try Firebase first, fallback to localStorage
+    async getInterviews(uid) {
+        // Always read localStorage — guaranteed to have data
+        const local = JSON.parse(localStorage.getItem('interveux_interviews') || '[]');
+        // Try Firebase too and merge
+        try {
+            if (typeof FirebaseDB !== 'undefined' && uid) {
+                const fb = await FirebaseDB.getInterviews(uid);
+                if (fb && fb.length > 0) {
+                    // Merge: firebase + any local-only items
+                    const fbIds = new Set(fb.map(i => i.id));
+                    const localOnly = local.filter(i => !fbIds.has(i.id) && !fbIds.has(i.firebaseId));
+                    return [...fb, ...localOnly];
+                }
+            }
+        } catch(e) {}
+        return local;
+    },
+    async getReports(uid) {
+        const local = JSON.parse(localStorage.getItem('interveux_reports') || '[]');
+        try {
+            if (typeof FirebaseDB !== 'undefined' && uid) {
+                const fb = await FirebaseDB.getAllReports(uid);
+                if (fb && fb.length > 0) return fb;
+            }
+        } catch(e) {}
+        return local;
+    }
+};
+
+// Safe date parser — handles ALL formats
+function safeDate(val) {
+    if (!val) return null;
+    try {
+        if (val && typeof val === 'object' && typeof val.toDate === 'function') return val.toDate();
+        if (val && typeof val === 'object' && typeof val.seconds === 'number') return new Date(val.seconds * 1000);
+        const d = new Date(val);
+        return isNaN(d.getTime()) ? null : d;
+    } catch(e) { return null; }
+}
+
+function fmtDate(val) {
+    const d = safeDate(val);
+    if (!d) return '--';
+    return d.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+}
+
+function scoreColor(s) {
+    if (s >= 80) return '#10b981';
+    if (s >= 60) return '#f59e0b';
+    if (s >= 40) return '#6366f1';
+    return '#ef4444';
+}
+
+function typeIcon(t) {
+    return {hr:'fa-users', technical:'fa-code', aptitude:'fa-brain', mixed:'fa-layer-group'}[t] || 'fa-video';
+}
+
+function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
+
+// Chart instances
+const charts = {};
+function destroyChart(k) { if (charts[k]) { charts[k].destroy(); delete charts[k]; } }
+
+// ── MAIN ──
+const Dash = {
+    user: null,
+    interviews: [],
+
+    async init() {
+        // Auth
+        this.user = await requireAuth('login.html').catch(() => null);
+
+        // Theme
+        const saved = localStorage.getItem('interveux_theme') || 'light';
+        document.documentElement.setAttribute('data-theme', saved);
+        const toggle = document.getElementById('darkModeToggle');
+        if (toggle) toggle.checked = saved === 'dark';
+        document.getElementById('dashThemeToggle')?.addEventListener('click', () => {
+            const t = typeof toggleTheme === 'function' ? toggleTheme() : 'light';
+            if (toggle) toggle.checked = t === 'dark';
+            const ic = document.querySelector('#dashThemeToggle i');
+            if (ic) ic.className = 'fas ' + (t === 'dark' ? 'fa-sun' : 'fa-moon');
+        });
+        document.getElementById('darkModeToggle')?.addEventListener('change', e => {
+            const t = e.target.checked ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', t);
+            localStorage.setItem('interveux_theme', t);
+        });
+
+        // Sidebar
+        document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+        document.addEventListener('click', e => {
+            const sb = document.getElementById('sidebar');
+            const tg = document.getElementById('sidebarToggle');
+            if (sb && !sb.contains(e.target) && !tg?.contains(e.target)) sb.classList.remove('open');
+        });
+
+        // Navigation
+        document.querySelectorAll('.sidebar-link[data-section]').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                const target = link.dataset.section;
+                document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+                document.querySelectorAll('.dashboard-section').forEach(s => s.classList.remove('active'));
+                link.classList.add('active');
+                document.getElementById('section-' + target)?.classList.add('active');
+                document.getElementById('sidebar').classList.remove('open');
+                if (target === 'analytics') this.renderAnalytics();
+                if (target === 'interviews') this.renderHistory();
+                if (target === 'reports') this.renderReports();
+            });
+        });
+
+        document.querySelectorAll('.view-all-link').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                document.querySelector(`.sidebar-link[data-section="${link.dataset.section}"]`)?.click();
+            });
+        });
+
+        document.getElementById('logoutBtn')?.addEventListener('click', () => {
+            if (typeof Auth !== 'undefined') Auth.logout();
+            else { localStorage.removeItem('interveux_demo_user'); window.location.href = 'index.html'; }
+        });
+
+        document.getElementById('startInterviewBtn')?.addEventListener('click', () => {
+            const role = document.getElementById('targetRole')?.value;
+            if (role) localStorage.setItem('interveux_target_role', role);
+            const type = document.getElementById('interviewType')?.value;
+            if (type) localStorage.setItem('interveux_interview_type', type);
+        });
+
+        document.getElementById('deleteAccountBtn')?.addEventListener('click', () => {
+            if (confirm('Permanently delete your account and all data?')) {
+                if (typeof showNotification === 'function') showNotification('Account deletion not available in demo mode.', 'info');
+            }
+        });
+
+        document.getElementById('profileForm')?.addEventListener('submit', async e => {
+            e.preventDefault();
+            const data = {
+                firstName: document.getElementById('profileFirstName')?.value,
+                lastName:  document.getElementById('profileLastName')?.value,
+                targetRole:document.getElementById('profileRole')?.value,
+                experience:document.getElementById('profileExperience')?.value,
+                industry:  document.getElementById('profileIndustry')?.value
+            };
+            if (typeof FirebaseDB !== 'undefined' && this.user) await FirebaseDB.updateProfile(this.user.uid, data).catch(() => {});
+            if (typeof showNotification === 'function') showNotification('Profile updated!', 'success');
+        });
+
+        // Load user info
+        const displayName = this.user?.displayName || this.user?.email?.split('@')[0] || 'User';
+        const initial = displayName.charAt(0).toUpperCase();
+        ['userAvatar','profileAvatar'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = initial; });
+        ['userName','welcomeName'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = displayName.split(' ')[0]; });
+        const profileName = document.getElementById('profileName');
+        if (profileName) profileName.textContent = displayName;
+        const profileEmail = document.getElementById('profileEmail');
+        if (profileEmail) profileEmail.textContent = this.user?.email || '';
+
+        // Load profile
+        if (typeof FirebaseDB !== 'undefined' && this.user) {
+            const p = await FirebaseDB.getProfile(this.user.uid).catch(() => null);
+            if (p) {
+                if (document.getElementById('profileFirstName')) document.getElementById('profileFirstName').value = p.firstName || '';
+                if (document.getElementById('profileLastName'))  document.getElementById('profileLastName').value  = p.lastName  || '';
+                if (document.getElementById('profileRole'))      document.getElementById('profileRole').value      = p.targetRole || '';
+                if (document.getElementById('profileExperience'))document.getElementById('profileExperience').value= p.experience || 'entry';
+                if (document.getElementById('profileIndustry'))  document.getElementById('profileIndustry').value  = p.industry  || 'tech';
+            }
+        }
+
+        // Load interviews
+        const uid = this.user?.uid || 'demo_user';
+        this.interviews = await DB.getInterviews(uid);
+        // Sort newest first
+        this.interviews.sort((a, b) => {
+            const da = safeDate(a.createdAt) || new Date(0);
+            const db = safeDate(b.createdAt) || new Date(0);
+            return db - da;
+        });
+
+        this.renderStats();
+        this.renderRecent();
+        this.renderOverviewCharts();
+    },
+
+    // ── STATS ──
+    renderStats() {
+        const iv = this.interviews;
+        const total = iv.length;
+        const avgScore = total ? Math.round(iv.reduce((s, i) => s + (i.score || 0), 0) / total) : 0;
+        const totalSec = iv.reduce((s, i) => s + (i.duration || 0), 0);
+        const hours = Math.round((totalSec / 3600) * 10) / 10;
+        const confArr = iv.filter(i => i.confidenceScore != null);
+        const confidence = confArr.length
+            ? Math.round(confArr.reduce((s, i) => s + i.confidenceScore, 0) / confArr.length)
+            : (avgScore > 0 ? Math.min(99, avgScore + 5) : 0);
+
+        // Animate
+        this._count('totalInterviews', total);
+        this._count('avgScore', avgScore);
+        this._count('confidenceScore', confidence, '%');
+        this._count('totalTime', hours, 'h');
+
+        // Badges
+        const scoreBadge = document.getElementById('scoreBadge');
+        if (scoreBadge) scoreBadge.textContent = avgScore >= 75 ? '🟢 Good' : avgScore >= 50 ? '🟡 Fair' : avgScore > 0 ? '🔴 Low' : '—';
+        const confBadge = document.getElementById('confBadge');
+        if (confBadge) confBadge.textContent = confidence >= 70 ? '🟢 High' : confidence >= 50 ? '🟡 Mid' : confidence > 0 ? '🔴 Low' : '—';
+        const totalBadge = document.getElementById('totalBadge');
+        if (totalBadge) totalBadge.textContent = total > 0 ? total + ' session' + (total !== 1 ? 's' : '') : 'All time';
+    },
+
+    _count(id, target, suffix = '', dur = 1200) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const isDecimal = target % 1 !== 0;
+        const start = performance.now();
+        const step = now => {
+            const p = Math.min((now - start) / dur, 1);
+            const e = 1 - Math.pow(1 - p, 3);
+            const v = target * e;
+            el.textContent = (isDecimal ? (Math.round(v * 10) / 10) : Math.floor(v)) + suffix;
+            if (p < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+    },
+
+    // ── OVERVIEW CHARTS ──
+    renderOverviewCharts() {
+        this._renderScoreHistory();
+        this._renderSkillBars();
+    },
+
+    _renderScoreHistory() {
+        destroyChart('perf');
+        const wrap = document.getElementById('perfChartWrap');
+        const empty = document.getElementById('perfEmpty');
+        const iv = this.interviews.slice(0, 10).reverse();
+
+        if (!iv.length) {
+            if (wrap) wrap.style.display = 'none';
+            if (empty) empty.style.display = 'flex';
+            return;
+        }
+        if (wrap) wrap.style.display = '';
+        if (empty) empty.style.display = 'none';
+
+        const labels = iv.map((x, i) => {
+            const d = safeDate(x.createdAt);
+            return d ? d.toLocaleDateString('en-US', {month:'short', day:'numeric'}) : 'S' + (i + 1);
+        });
+        const data = iv.map(x => x.score || 0);
+
+        const ctx = document.getElementById('performanceChart');
+        if (!ctx) return;
+        charts.perf = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Score',
+                    data,
+                    borderColor: '#6366f1',
+                    backgroundColor: 'rgba(99,102,241,0.08)',
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: data.map(v => scoreColor(v)),
+                    pointRadius: 5,
+                    pointHoverRadius: 7
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: ctx => 'Score: ' + ctx.raw + '/100' } }
+                },
+                scales: {
+                    y: { min: 0, max: 100, grid: { color: 'rgba(148,163,184,0.1)' }, ticks: { color: '#94a3b8' } },
+                    x: { grid: { display: false }, ticks: { color: '#94a3b8', maxRotation: 0 } }
+                }
+            }
+        });
+        const badge = document.getElementById('chartBadge');
+        if (badge) badge.textContent = iv.length + ' session' + (iv.length !== 1 ? 's' : '');
+    },
+
+    _renderSkillBars() {
+        const wrap = document.getElementById('skillBarsWrap');
+        const empty = document.getElementById('skillEmpty');
+        if (!wrap) return;
+
+        const skillKeys   = ['technical','communication','confidence','bodyLanguage','clarity','depth'];
+        const skillLabels = ['Technical','Communication','Confidence','Body Language','Clarity','Depth'];
+        const totals = Object.fromEntries(skillKeys.map(k => [k, { sum: 0, count: 0 }]));
+
+        this.interviews.forEach(iv => {
+            const s = iv.skills || {};
+            skillKeys.forEach(k => {
+                const v = s[k] ?? iv[k] ?? null;
+                if (v !== null && typeof v === 'number') { totals[k].sum += v; totals[k].count++; }
+            });
+            // Also read top-level confidence/bodyLanguage
+            if (iv.confidenceScore) { totals.confidence.sum += iv.confidenceScore; totals.confidence.count++; }
+        });
+
+        const vals = skillKeys.map(k => totals[k].count > 0 ? Math.round(totals[k].sum / totals[k].count) : 0);
+        const hasData = vals.some(v => v > 0);
+
+        if (!hasData) {
+            wrap.style.display = 'none';
+            if (empty) empty.style.display = 'flex';
+            return;
+        }
+        wrap.style.display = '';
+        if (empty) empty.style.display = 'none';
+
+        wrap.innerHTML = skillKeys.map((k, i) => `
+            <div class="skill-row">
+                <div class="skill-top">
+                    <span class="skill-name">${skillLabels[i]}</span>
+                    <span class="skill-pct">${vals[i]}%</span>
+                </div>
+                <div class="skill-track">
+                    <div class="skill-fill" style="width:0%" data-target="${vals[i]}"></div>
+                </div>
+            </div>
+        `).join('');
+
+        // Animate bars
+        requestAnimationFrame(() => {
+            wrap.querySelectorAll('.skill-fill').forEach(el => {
+                el.style.width = el.dataset.target + '%';
+            });
+        });
+    },
+
+    // ── RECENT LIST ──
+    renderRecent() {
+        const container = document.getElementById('recentList');
+        if (!container) return;
+        const iv = this.interviews.slice(0, 5);
+
+        if (!iv.length) {
+            container.innerHTML = `<div class="empty-state">
+                <i class="fas fa-video-slash"></i>
+                <h4>No interviews yet</h4>
+                <p>Start your first AI-powered interview to see results here.</p>
+                <a href="interview.html" class="btn-primary btn-sm">Start Interview</a>
+            </div>`;
+            return;
+        }
+
+        container.innerHTML = iv.map(item => {
+            const sc = item.score || 0;
+            const scCol = scoreColor(sc);
+            return `<div class="rec-item">
+                <div class="rec-left">
+                    <div class="rec-ico ${item.type || 'hr'}"><i class="fas ${typeIcon(item.type)}"></i></div>
+                    <div>
+                        <div class="rec-name">${cap(item.type || 'hr')} Interview</div>
+                        <div class="rec-meta">${fmtDate(item.createdAt)} • ${cap(item.difficulty || 'medium')} • ${item.questionsAnswered || 0} questions</div>
+                    </div>
+                </div>
+                <div class="rec-right">
+                    <span class="rec-score" style="color:${scCol}">${sc}<small style="font-size:.65rem;color:#94a3b8">/100</small></span>
+                    ${item.reportId ? `<a href="report.html?id=${item.reportId}" class="btn-outline btn-sm">Report</a>` : ''}
+                </div>
+            </div>`;
+        }).join('');
+    },
+
+    // ── HISTORY ──
+    renderHistory() {
+        const container = document.getElementById('interviewsHistory');
+        if (!container) return;
+        const iv = this.interviews;
+
+        if (!iv.length) {
+            container.innerHTML = '<div class="empty-state"><i class="fas fa-clock"></i><h4>No interview history yet</h4></div>';
+            return;
+        }
+
+        container.innerHTML = iv.map(item => {
+            const sc = item.score || 0;
+            const mins = Math.round((item.duration || 0) / 60);
+            return `<div class="rec-item glass-card" style="margin-bottom:.75rem">
+                <div class="rec-left">
+                    <div class="rec-ico ${item.type || 'hr'}"><i class="fas ${typeIcon(item.type)}"></i></div>
+                    <div>
+                        <div class="rec-name">${cap(item.type || 'hr')} Interview</div>
+                        <div class="rec-meta">${fmtDate(item.createdAt)} • ${cap(item.difficulty || 'medium')} • ${mins} min</div>
+                    </div>
+                </div>
+                <div class="rec-right">
+                    <span class="rec-score" style="color:${scoreColor(sc)}">${sc}/100</span>
+                    ${item.reportId ? `<a href="report.html?id=${item.reportId}" class="btn-primary btn-sm">View Report</a>` : '<span style="font-size:.78rem;color:#94a3b8">No report</span>'}
+                </div>
+            </div>`;
+        }).join('');
+    },
+
+    // ── REPORTS ──
+    async renderReports() {
+        const container = document.getElementById('reportsList');
+        if (!container) return;
+        const uid = this.user?.uid || 'demo_user';
+        const reports = await DB.getReports(uid);
+
+        if (!reports || !reports.length) {
+            container.innerHTML = `<div class="empty-state">
+                <i class="fas fa-file-lines"></i>
+                <h4>No reports yet</h4>
+                <p>Complete an interview to generate your first AI report.</p>
+            </div>`;
+            return;
+        }
+
+        container.innerHTML = reports.map(r => `
+            <div class="rec-item glass-card" style="margin-bottom:.75rem">
+                <div class="rec-left">
+                    <div class="rec-ico ${r.type || 'hr'}"><i class="fas fa-file-chart-column"></i></div>
+                    <div>
+                        <div class="rec-name">${cap(r.type || 'hr')} Interview Report</div>
+                        <div class="rec-meta">${fmtDate(r.createdAt)} • Score: ${r.scores?.overall || 0}/100</div>
+                    </div>
+                </div>
+                <div class="rec-right">
+                    <a href="report.html?id=${r.id}" class="btn-primary btn-sm">View Report</a>
+                </div>
+            </div>
+        `).join('');
+    },
+
+    // ── ANALYTICS ──
+    renderAnalytics() {
+        destroyChart('anScore'); destroyChart('anRadar'); destroyChart('anType');
+        const iv = [...this.interviews].reverse(); // oldest first for timeline
+
+        // Mini stats
+        const total = iv.length;
+        const best  = total ? Math.max(...iv.map(i => i.score || 0)) : 0;
+        const totalSec = iv.reduce((s, i) => s + (i.duration || 0), 0);
+        const hours = Math.round((totalSec / 3600) * 10) / 10;
+        const el = id => document.getElementById(id);
+        if (el('anTotal')) el('anTotal').textContent = total;
+        if (el('anBest'))  el('anBest').textContent  = best;
+        if (el('anTime'))  el('anTime').textContent  = hours + 'h';
+
+        // Score History
+        const anScoreEmpty = el('anScoreEmpty');
+        const anScoreWrap  = el('anScoreWrap');
+        if (!iv.length) {
+            if (anScoreWrap) anScoreWrap.style.display = 'none';
+            if (anScoreEmpty) anScoreEmpty.style.display = 'flex';
+        } else {
+            if (anScoreWrap) anScoreWrap.style.display = '';
+            if (anScoreEmpty) anScoreEmpty.style.display = 'none';
+            const ctx = el('anScoreChart');
+            if (ctx) {
+                charts.anScore = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: iv.map((x, i) => {
+                            const d = safeDate(x.createdAt);
+                            return d ? d.toLocaleDateString('en-US', {month:'short', day:'numeric'}) : 'S' + (i + 1);
+                        }),
+                        datasets: [{
+                            label: 'Score',
+                            data: iv.map(x => x.score || 0),
+                            backgroundColor: iv.map(x => {
+                                const s = x.score || 0;
+                                return s >= 75 ? 'rgba(16,185,129,0.7)' : s >= 50 ? 'rgba(99,102,241,0.7)' : 'rgba(239,68,68,0.65)';
+                            }),
+                            borderRadius: 6,
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { callbacks: { label: c => 'Score: ' + c.raw + '/100' } }
+                        },
+                        scales: {
+                            y: { min: 0, max: 100, ticks: { color: '#94a3b8' }, grid: { color: 'rgba(148,163,184,0.1)' } },
+                            x: { ticks: { color: '#94a3b8', maxRotation: 45 }, grid: { display: false } }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Radar
+        const skillKeys   = ['technical','communication','confidence','bodyLanguage','clarity','depth'];
+        const skillLabels = ['Technical','Comm.','Confidence','Body Lang.','Clarity','Depth'];
+        const totals = Object.fromEntries(skillKeys.map(k => [k, { sum: 0, count: 0 }]));
+        iv.forEach(x => {
+            const s = x.skills || {};
+            skillKeys.forEach(k => {
+                const v = s[k] ?? x[k] ?? null;
+                if (v !== null && typeof v === 'number') { totals[k].sum += v; totals[k].count++; }
+            });
+            if (x.confidenceScore) { totals.confidence.sum += x.confidenceScore; totals.confidence.count++; }
+        });
+        const skillVals = skillKeys.map(k => totals[k].count > 0 ? Math.round(totals[k].sum / totals[k].count) : 0);
+        const hasSkills = skillVals.some(v => v > 0);
+
+        const anRadarEmpty = el('anRadarEmpty');
+        const anRadarWrap  = el('anRadarWrap');
+        if (!hasSkills) {
+            if (anRadarWrap) anRadarWrap.style.display = 'none';
+            if (anRadarEmpty) anRadarEmpty.style.display = 'flex';
+        } else {
+            if (anRadarWrap) anRadarWrap.style.display = '';
+            if (anRadarEmpty) anRadarEmpty.style.display = 'none';
+            const ctx = el('anRadarChart');
+            if (ctx) {
+                charts.anRadar = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: skillLabels,
+                        datasets: [{
+                            label: 'Your Skills',
+                            data: skillVals,
+                            borderColor: '#6366f1',
+                            backgroundColor: 'rgba(99,102,241,0.15)',
+                            pointBackgroundColor: '#6366f1'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: { r: { min: 0, max: 100, ticks: { display: false }, grid: { color: 'rgba(148,163,184,0.15)' }, pointLabels: { color: '#94a3b8', font: { size: 11 } } } }
+                    }
+                });
+            }
+        }
+
+        // Type distribution
+        const typeCounts = {};
+        iv.forEach(x => { const t = x.type || 'hr'; typeCounts[t] = (typeCounts[t] || 0) + 1; });
+        const typeKeys = Object.keys(typeCounts);
+        const anTypeEmpty = el('anTypeEmpty');
+        const anTypeWrap  = el('anTypeWrap');
+        if (!typeKeys.length) {
+            if (anTypeWrap) anTypeWrap.style.display = 'none';
+            if (anTypeEmpty) anTypeEmpty.style.display = 'flex';
+        } else {
+            if (anTypeWrap) anTypeWrap.style.display = '';
+            if (anTypeEmpty) anTypeEmpty.style.display = 'none';
+            const ctx = el('anTypeChart');
+            if (ctx) {
+                charts.anType = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: typeKeys.map(cap),
+                        datasets: [{
+                            data: typeKeys.map(k => typeCounts[k]),
+                            backgroundColor: ['#6366f1','#3b82f6','#f59e0b','#10b981'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', padding: 12, font: { size: 12 } } } },
+                        cutout: '60%'
+                    }
+                });
+            }
+        }
+    }
+};
+
+document.addEventListener('DOMContentLoaded', () => Dash.init());
+</script>
+</body>
+</html>

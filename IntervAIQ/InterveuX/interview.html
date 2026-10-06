@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interview Session — InterveuX</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --p:#6366f1;--p2:#8b5cf6;--green:#10b981;--amber:#f59e0b;--red:#ef4444;
+  --bg:#0d0d1f;--card:rgba(255,255,255,0.05);--border:rgba(255,255,255,0.1);
+  --text:#f1f5f9;--muted:#94a3b8;
+}
+html,body{height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:var(--text);overflow:hidden}
+ 
+/* ── PERMISSION SCREEN ── */
+#permScreen{
+  position:fixed;inset:0;z-index:999;
+  background:radial-gradient(ellipse at 30% 20%,#1e1b4b 0%,#0d0d1f 70%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:1.5rem;padding:2rem;text-align:center;
+}
+.perm-pulse{
+  width:88px;height:88px;border-radius:50%;
+  background:linear-gradient(135deg,var(--p),var(--p2));
+  display:flex;align-items:center;justify-content:center;font-size:2.2rem;
+  animation:ppulse 2s ease-in-out infinite;
+}
+@keyframes ppulse{0%,100%{box-shadow:0 0 0 0 rgba(99,102,241,.5)}50%{box-shadow:0 0 0 22px rgba(99,102,241,0)}}
+#permScreen h2{font-size:1.7rem;font-weight:700}
+#permScreen p{color:var(--muted);max-width:400px;line-height:1.6}
+.perm-cards{display:flex;gap:.75rem;flex-wrap:wrap;justify-content:center;max-width:480px}
+.perm-card{
+  background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:12px;
+  padding:.85rem 1.1rem;display:flex;align-items:center;gap:.7rem;
+  font-size:.87rem;flex:1;min-width:180px;text-align:left;
+}
+.perm-card i{font-size:1.15rem;color:var(--p)}
+#allowBtn{
+  background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;border:none;
+  border-radius:14px;padding:.95rem 2.8rem;font-size:1.05rem;font-weight:600;
+  cursor:pointer;display:flex;align-items:center;gap:.55rem;
+  transition:transform .2s,box-shadow .2s;
+}
+#allowBtn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 10px 32px rgba(99,102,241,.45)}
+#allowBtn:disabled{opacity:.6;cursor:not-allowed}
+#permErr{color:#fca5a5;font-size:.84rem;display:none;max-width:400px;line-height:1.5}
+ 
+/* ── SETUP SCREEN ── */
+#setupScreen{
+  display:none;position:fixed;inset:0;z-index:998;
+  background:radial-gradient(ellipse at 70% 80%,#1e1b4b 0%,#0d0d1f 70%);
+  flex-direction:column;align-items:center;justify-content:center;
+  gap:1.25rem;padding:2rem;text-align:center;overflow-y:auto;
+}
+#setupScreen h2{font-size:1.5rem;font-weight:700}
+.ss-steps{width:100%;max-width:400px;display:flex;flex-direction:column;gap:.6rem}
+.ss-step{
+  background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:12px;
+  padding:.8rem 1.1rem;display:flex;align-items:center;gap:.8rem;text-align:left;
+}
+.ss-step i{font-size:1.1rem;width:20px;text-align:center}
+.ss-step .ss-title{font-size:.9rem;font-weight:600}
+.ss-step .ss-sub{font-size:.78rem;color:var(--muted)}
+.preview-wrap{
+  width:320px;height:180px;border-radius:14px;overflow:hidden;
+  background:#000;border:1px solid var(--border);position:relative;flex-shrink:0;
+}
+#previewVideo{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+#noCamMsg{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;color:var(--muted);gap:.5rem;font-size:.85rem;
+}
+#noCamMsg i{font-size:1.5rem}
+.cfg-row{display:flex;gap:.75rem;flex-wrap:wrap;justify-content:center;max-width:480px}
+.cfg-group{display:flex;flex-direction:column;gap:.3rem;flex:1;min-width:130px}
+.cfg-group label{font-size:.78rem;color:var(--muted)}
+.cfg-group select{
+  background:rgba(255,255,255,.07);border:1px solid var(--border);color:var(--text);
+  border-radius:9px;padding:.55rem .8rem;font-size:.88rem;font-family:'Inter',sans-serif;
+}
+#startBtn{
+  background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;border:none;
+  border-radius:14px;padding:.9rem 2.5rem;font-size:1rem;font-weight:600;cursor:pointer;
+  display:flex;align-items:center;gap:.5rem;opacity:.5;
+  transition:opacity .3s,transform .2s,box-shadow .2s;
+}
+#startBtn:not(:disabled):hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(99,102,241,.4)}
+#startBtn:disabled{cursor:not-allowed}
+.back-link{color:var(--muted);font-size:.83rem;text-decoration:none;display:flex;align-items:center;gap:.3rem}
+.back-link:hover{color:var(--p)}
+ 
+/* ── MAIN INTERVIEW APP ── */
+#app{
+  display:none;flex-direction:column;height:100vh;
+}
+ 
+/* top bar */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.6rem 1.25rem;background:rgba(255,255,255,.03);
+  border-bottom:1px solid var(--border);flex-shrink:0;gap:.75rem;
+}
+.tl{display:flex;align-items:center;gap:.5rem;font-weight:700;font-size:1rem}
+.tl svg{flex-shrink:0}
+.tm{display:flex;align-items:center;gap:1.2rem;font-size:.82rem;color:var(--muted)}
+.rec{color:var(--red);animation:rblink 1s infinite}
+@keyframes rblink{0%,100%{opacity:1}50%{opacity:.3}}
+.tr{display:flex;align-items:center;gap:.5rem}
+.ibtn{
+  width:36px;height:36px;border-radius:9px;background:rgba(255,255,255,.06);
+  border:1px solid var(--border);color:var(--text);cursor:pointer;
+  font-size:.88rem;display:flex;align-items:center;justify-content:center;transition:.2s;
+}
+.ibtn:hover{background:rgba(255,255,255,.12)}
+.endbtn{
+  background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#fca5a5;
+  border-radius:9px;padding:.4rem .9rem;font-size:.82rem;font-weight:600;cursor:pointer;
+  display:flex;align-items:center;gap:.35rem;transition:.2s;
+}
+.endbtn:hover{background:rgba(239,68,68,.28)}
+ 
+/* two panel main */
+.panels{display:flex;flex:1;overflow:hidden;min-height:0}
+ 
+/* ── LEFT PANEL ── */
+.left-panel{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:1rem .75rem;
+  border-right:1px solid var(--border);
+  background:linear-gradient(180deg,rgba(99,102,241,.05) 0%,rgba(139,92,246,.02) 100%);
+  gap:.85rem;overflow:hidden;
+}
+.ai-label{
+  display:flex;align-items:center;gap:.45rem;font-size:.75rem;font-weight:600;
+  letter-spacing:.5px;text-transform:uppercase;color:var(--p);
+}
+.aidot{width:7px;height:7px;border-radius:50%;background:var(--p);animation:rblink 1.5s infinite}
+ 
+/* avatar */
+.av-wrap{position:relative;width:200px;height:200px;flex-shrink:0}
+.av-ring{
+  position:absolute;inset:-7px;border-radius:50%;
+  border:2.5px solid rgba(99,102,241,.25);
+  animation:ringbreath 3s ease-in-out infinite;
+}
+@keyframes ringbreath{0%,100%{box-shadow:0 0 0 0 rgba(99,102,241,.1)}50%{box-shadow:0 0 0 12px rgba(99,102,241,0)}}
+.av-ring.rs{border-color:var(--p)!important;box-shadow:0 0 0 7px rgba(99,102,241,.2),0 0 28px rgba(99,102,241,.15)!important;animation:none!important}
+.av-ring.rt{border-color:var(--amber)!important;box-shadow:0 0 0 6px rgba(245,158,11,.15)!important;animation:ringamb 1s ease-in-out infinite!important}
+@keyframes ringamb{0%,100%{box-shadow:0 0 0 4px rgba(245,158,11,.1)}50%{box-shadow:0 0 0 12px rgba(245,158,11,.04)}}
+.av-ring.rl{border-color:var(--green)!important;box-shadow:0 0 0 6px rgba(16,185,129,.15)!important;animation:ringgrn .8s ease-in-out infinite!important}
+@keyframes ringgrn{0%,100%{box-shadow:0 0 0 4px rgba(16,185,129,.1)}50%{box-shadow:0 0 0 14px rgba(16,185,129,.04)}}
+.av-img{
+  width:200px;height:200px;border-radius:50%;object-fit:cover;object-position:top center;
+  border:3px solid rgba(255,255,255,.1);display:block;
+  transition:filter .3s ease;
+}
+.av-img.si{filter:brightness(1.08) saturate(1.1);animation:speakp .45s ease-in-out infinite alternate}
+@keyframes speakp{from{transform:scale(1)}to{transform:scale(1.022)}}
+.av-img.th{filter:brightness(.94) saturate(.8) hue-rotate(18deg);animation:thinkb 1.2s ease-in-out infinite alternate}
+@keyframes thinkb{from{transform:translateY(0)}to{transform:translateY(-5px)}}
+.av-img.li{filter:brightness(1.06) saturate(1.15)}
+.av-img.id{filter:brightness(1) saturate(1)}
+.av-badge{
+  position:absolute;bottom:4px;left:50%;transform:translateX(-50%);
+  background:rgba(0,0,0,.72);backdrop-filter:blur(6px);border-radius:20px;
+  padding:3px 12px;font-size:10px;font-weight:600;letter-spacing:.4px;
+  color:#fff;white-space:nowrap;transition:background .3s;pointer-events:none;
+}
+ 
+/* wave bars */
+.wavebars{display:flex;align-items:center;gap:3px;height:26px}
+.wb{
+  width:3px;border-radius:3px;height:100%;
+  background:linear-gradient(180deg,var(--p),var(--p2));
+  animation:wba .5s ease-in-out infinite alternate;animation-play-state:paused;
+}
+.wb:nth-child(1){animation-delay:.00s}.wb:nth-child(2){animation-delay:.08s}
+.wb:nth-child(3){animation-delay:.16s}.wb:nth-child(4){animation-delay:.06s}
+.wb:nth-child(5){animation-delay:.12s}.wb:nth-child(6){animation-delay:.18s}
+.wb:nth-child(7){animation-delay:.04s}
+@keyframes wba{from{transform:scaleY(.2);opacity:.4}to{transform:scaleY(1);opacity:1}}
+.wavebars.on .wb{animation-play-state:running!important}
+ 
+/* question box */
+.qbox{
+  width:100%;max-width:400px;background:rgba(255,255,255,.05);
+  border:1px solid var(--border);border-radius:14px;padding:1rem 1.15rem;
+}
+.qlabel{font-size:.7rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--p);margin-bottom:.45rem;display:flex;align-items:center;gap:.35rem}
+.qtext{font-size:.97rem;line-height:1.55;color:var(--text);min-height:44px}
+.qprog-track{height:4px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;margin-top:.7rem}
+.qprog-fill{height:100%;border-radius:4px;width:0%;background:linear-gradient(90deg,var(--p),var(--p2));transition:width .5s ease}
+.qcounter{font-size:.72rem;color:var(--muted);margin-top:.35rem;text-align:right}
+ 
+/* ── RIGHT PANEL ── */
+.right-panel{
+  flex:1;display:flex;flex-direction:column;padding:1rem .75rem;gap:.75rem;overflow:hidden;
+}
+.cand-header{display:flex;align-items:center;justify-content:space-between}
+.clive{display:flex;align-items:center;gap:.45rem;font-size:.75rem;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--green)}
+.ldot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:rblink 1s infinite}
+.metrics{display:flex;gap:.4rem}
+.mchip{
+  background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;
+  padding:.28rem .65rem;font-size:.75rem;display:flex;align-items:center;gap:.35rem;color:var(--muted);
+}
+.mchip i{font-size:.78rem}
+ 
+/* video */
+.vid-wrap{position:relative;flex:1;background:#000;border-radius:14px;overflow:hidden;min-height:0}
+#candidateVideo{width:100%;height:100%;object-fit:cover;display:block;transform:scaleX(-1)}
+.vid-badges{position:absolute;bottom:10px;left:10px;display:flex;gap:.45rem}
+.vbadge{
+  background:rgba(0,0,0,.68);backdrop-filter:blur(6px);border-radius:8px;
+  padding:.28rem .65rem;font-size:.75rem;display:flex;align-items:center;gap:.35rem;
+}
+ 
+/* transcript */
+.transcript-box{
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:12px;padding:.75rem 1rem;flex-shrink:0;
+}
+.tr-label{
+  font-size:.68rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+  color:var(--muted);margin-bottom:.35rem;display:flex;align-items:center;gap:.35rem;
+}
+#liveTranscript{font-size:.88rem;color:var(--text);line-height:1.5;min-height:36px;max-height:56px;overflow-y:auto}
+ 
+/* ── BOTTOM BAR ── */
+.botbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.65rem 1.25rem;border-top:1px solid var(--border);
+  background:rgba(255,255,255,.02);flex-shrink:0;gap:.75rem;
+}
+.bl{display:flex;align-items:center;gap:1rem}
+.br{display:flex;align-items:center;gap:.55rem}
+.timer-chip{font-size:.82rem;color:var(--muted);display:flex;align-items:center;gap:.35rem}
+.vstatus{display:flex;align-items:center;gap:.45rem;font-size:.8rem;color:var(--muted)}
+.vdot{width:8px;height:8px;border-radius:50%;background:var(--muted);transition:background .3s}
+.vdot.on{background:var(--green);animation:rblink .8s infinite}
+.recbtn{
+  width:52px;height:52px;border-radius:50%;border:none;color:#fff;font-size:1.1rem;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,var(--p),var(--p2));
+  box-shadow:0 4px 20px rgba(99,102,241,.35);transition:transform .2s,box-shadow .2s;
+}
+.recbtn:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(99,102,241,.5)}
+.recbtn.rec{background:linear-gradient(135deg,var(--red),#dc2626);box-shadow:0 4px 20px rgba(239,68,68,.4)}
+.skipbtn{
+  background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);
+  border-radius:9px;padding:.48rem .95rem;font-size:.83rem;font-weight:500;
+  cursor:pointer;display:flex;align-items:center;gap:.35rem;transition:.2s;
+}
+.skipbtn:hover{background:rgba(255,255,255,.1)}
+.nextbtn{
+  background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;border:none;
+  border-radius:9px;padding:.48rem 1.1rem;font-size:.83rem;font-weight:600;
+  cursor:pointer;display:flex;align-items:center;gap:.35rem;
+  transition:transform .2s,box-shadow .2s;
+}
+.nextbtn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(99,102,241,.4)}
+ 
+/* ── MODALS ── */
+.modal{
+  position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.75);
+  backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;
+}
+.modal.on{display:flex}
+.mbox{
+  background:#1a1a2e;border:1px solid var(--border);border-radius:20px;
+  padding:2rem;max-width:420px;width:90%;text-align:center;
+}
+.mbox h3{font-size:1.25rem;margin-bottom:.55rem}
+.mbox p{color:var(--muted);font-size:.88rem;line-height:1.6;margin-bottom:1.4rem}
+.mbtns{display:flex;gap:.65rem;justify-content:center}
+.mghostbtn{background:rgba(255,255,255,.07);border:1px solid var(--border);color:var(--text);border-radius:9px;padding:.58rem 1.2rem;font-size:.88rem;cursor:pointer}
+.mpribtn{background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;border:none;border-radius:9px;padding:.58rem 1.2rem;font-size:.88rem;font-weight:600;cursor:pointer}
+.procspin{width:58px;height:58px;border-radius:50%;border:3px solid rgba(99,102,241,.2);border-top-color:var(--p);animation:spin 1s linear infinite;margin:0 auto 1rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+.procsteps{text-align:left;margin-top:1rem;display:flex;flex-direction:column;gap:.4rem}
+.pstep{font-size:.83rem;color:var(--muted);display:flex;align-items:center;gap:.5rem}
+.pstep.done{color:var(--green)}.pstep.act{color:var(--text)}
+ 
+/* feedback panel (right side after interview) */
+#feedbackPanel{display:none;flex-direction:column;gap:.65rem;overflow-y:auto;padding-right:.25rem}
+.fb-score-row{display:flex;gap:.65rem;flex-wrap:wrap}
+.fb-score-card{
+  flex:1;min-width:100px;background:rgba(255,255,255,.05);border:1px solid var(--border);
+  border-radius:12px;padding:.85rem;text-align:center;
+}
+.fb-score-card .fbs-val{font-size:1.6rem;font-weight:700;font-family:'Inter',sans-serif}
+.fb-score-card .fbs-lbl{font-size:.72rem;color:var(--muted);margin-top:.2rem}
+.fb-section{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:.85rem 1rem}
+.fb-section h4{font-size:.82rem;font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin-bottom:.6rem}
+.fb-section h4.green{color:var(--green)}.fb-section h4.red{color:var(--red)}.fb-section h4.purple{color:var(--p)}
+.fb-section p,.fb-section li{font-size:.83rem;color:var(--muted);line-height:1.55}
+.fb-section ul{padding-left:1rem}
+.fb-section li{margin-bottom:.3rem}
+.qfb-item{margin-bottom:.65rem;padding-bottom:.65rem;border-bottom:1px solid var(--border)}
+.qfb-item:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.qfb-q{font-size:.82rem;font-weight:600;margin-bottom:.25rem}
+.qfb-score{display:inline-block;padding:.1rem .55rem;border-radius:20px;font-size:.72rem;font-weight:700;margin-bottom:.25rem}
+.qfb-fb{font-size:.78rem;color:var(--muted);line-height:1.5}
+.view-full-btn{
+  background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;border:none;
+  border-radius:10px;padding:.65rem 1.5rem;font-size:.88rem;font-weight:600;
+  cursor:pointer;display:flex;align-items:center;gap:.4rem;margin:0 auto;
+  transition:transform .2s,box-shadow .2s;
+}
+.view-full-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(99,102,241,.4)}
+</style>
+</head>
+<body>
+ 
+<!-- PERMISSION SCREEN -->
+<div id="permScreen">
+  <div class="perm-pulse">🎥</div>
+  <h2>Allow Camera &amp; Microphone</h2>
+  <p>InterveuX needs your camera and mic to run the live AI interview session.</p>
+  <div class="perm-cards">
+    <div class="perm-card"><i class="fas fa-video"></i><div><strong>Camera</strong><br><span style="color:var(--muted);font-size:.78rem">Expression &amp; posture tracking</span></div></div>
+    <div class="perm-card"><i class="fas fa-microphone"></i><div><strong>Microphone</strong><br><span style="color:var(--muted);font-size:.78rem">Answer transcription &amp; scoring</span></div></div>
+  </div>
+  <button id="allowBtn"><i class="fas fa-play"></i> Allow &amp; Continue</button>
+  <p id="permErr"></p>
+</div>
+ 
+<!-- SETUP SCREEN -->
+<!-- SETUP SCREEN -->
+<div id="setupScreen">
+  <h2>Setting Up Your Interview</h2>
+
+  <div class="ss-steps">
+    <div class="ss-step" id="ss1">
+      <i class="fas fa-spinner fa-spin" style="color:var(--p)"></i>
+      <div>
+        <div class="ss-title">Camera</div>
+        <div class="ss-sub" id="ss1t">Checking…</div>
+      </div>
+    </div>
+
+    <div class="ss-step" id="ss2">
+      <i class="fas fa-spinner fa-spin" style="color:var(--p)"></i>
+      <div>
+        <div class="ss-title">Microphone</div>
+        <div class="ss-sub" id="ss2t">Checking…</div>
+      </div>
+    </div>
+
+    <div class="ss-step" id="ss3">
+      <i class="fas fa-spinner fa-spin" style="color:var(--p)"></i>
+      <div>
+        <div class="ss-title">AI Engine</div>
+        <div class="ss-sub" id="ss3t">Loading questions…</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="preview-wrap">
+    <video id="previewVideo" autoplay muted playsinline></video>
+    <div id="noCamMsg">
+      <i class="fas fa-video-slash"></i>
+      Camera not detected
+    </div>
+  </div>
+
+  <div class="cfg-row">
+
+    <!-- Interview Type -->
+    <div class="cfg-group">
+      <label>Interview Type</label>
+      <select id="cfgType">
+        <option value="hr">HR / Behavioral</option>
+        <option value="technical">Technical</option>
+        <option value="aptitude">Aptitude</option>
+        <option value="mixed">Mixed</option>
+      </select>
+    </div>
+
+    <!-- Target Role -->
+    <div class="cfg-group">
+      <label>Target Role</label>
+      <select id="roleSelect">
+        <option value="Software Engineer">Software Engineer</option>
+        <option value="Frontend Developer">Frontend Developer</option>
+        <option value="Backend Developer">Backend Developer</option>
+        <option value="Full Stack Developer">Full Stack Developer</option>
+        <option value="Data Scientist">Data Scientist</option>
+        <option value="DevOps Engineer">DevOps Engineer</option>
+        <option value="Cyber Security Analyst">Cyber Security Analyst</option>
+        <option value="UI/UX Designer">UI/UX Designer</option>
+      </select>
+    </div>
+
+    <!-- Difficulty -->
+    <div class="cfg-group">
+      <label>Difficulty</label>
+      <select id="cfgDiff">
+        <option value="easy">Easy</option>
+        <option value="medium" selected>Medium</option>
+        <option value="hard">Hard</option>
+      </select>
+    </div>
+
+    <!-- Number of Questions -->
+    <div class="cfg-group">
+      <label>Questions</label>
+      <select id="cfgNum">
+        <option value="5">5 Questions</option>
+        <option value="10" selected>10 Questions</option>
+        <option value="15">15 Questions</option>
+      </select>
+    </div>
+
+  </div>
+
+  <button id="startBtn" disabled>
+    <i class="fas fa-play"></i>
+    Start Interview
+  </button>
+
+  <a href="dashboard.html" class="back-link">
+    <i class="fas fa-arrow-left"></i>
+    Back to Dashboard
+  </a>
+</div>
+ 
+<!-- MAIN APP -->
+<div id="app">
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="sidebar-header">
+    <a href="index.html" class="nav-logo">
+        <img src="assets/logo.png" alt="InterveuX"
+             style="width:140px;height:52px;object-fit:contain;border-radius:0;display:block">
+    </a>
+</div>
+    <div class="tm">
+      <span><i class="fas fa-circle rec"></i> Live</span>
+      <span><i class="fas fa-clock"></i> <span id="timerEl">00:00</span></span>
+      <span>Q <span id="qNum">1</span>/<span id="qTotal">10</span></span>
+    </div>
+    <div class="tr">
+      <button class="ibtn" id="btnCam" title="Toggle Camera"><i class="fas fa-video"></i></button>
+      <button class="ibtn" id="btnMicT" title="Toggle Mic"><i class="fas fa-microphone"></i></button>
+      <button class="endbtn" id="btnEnd"><i class="fas fa-phone-slash"></i> End</button>
+    </div>
+  </div>
+ 
+  <!-- PANELS -->
+  <div class="panels">
+    <!-- LEFT — AI Avatar -->
+    <div class="left-panel">
+      <div class="ai-label"><span class="aidot"></span>AI Interviewer</div>
+      <div class="av-wrap">
+        <div class="av-ring" id="avRing"></div>
+        <img id="avImg" src="AI-talking-avatar.gif" alt="AI" class="av-img id"/>
+        <div class="av-badge" id="avBadge">Ready</div>
+      </div>
+      <div class="wavebars" id="waveBars">
+        <div class="wb"></div><div class="wb"></div><div class="wb"></div>
+        <div class="wb"></div><div class="wb"></div><div class="wb"></div>
+        <div class="wb"></div>
+      </div>
+      <div class="qbox">
+        <div class="qlabel"><i class="fas fa-comment-dots"></i>Current Question</div>
+        <div class="qtext" id="qText">Preparing your first question…</div>
+        <div class="qprog-track"><div class="qprog-fill" id="qProg"></div></div>
+        <div class="qcounter" id="qCounter">Question 1 of 10</div>
+      </div>
+    </div>
+ 
+    <!-- RIGHT — Candidate / Feedback -->
+    <div class="right-panel">
+      <!-- candidate view (shown during interview) -->
+      <div id="candidateView" style="display:flex;flex-direction:column;flex:1;gap:.75rem;min-height:0">
+        <div class="cand-header">
+          <div class="clive"><span class="ldot"></span>You (Candidate)</div>
+          <div class="metrics">
+            <div class="mchip"><i class="fas fa-eye"></i><span id="eyeV">--</span></div>
+            <div class="mchip"><i class="fas fa-smile"></i><span id="confV">--</span></div>
+            <div class="mchip"><i class="fas fa-person"></i><span id="postV">--</span></div>
+          </div>
+        </div>
+        <div class="vid-wrap">
+          <video id="candidateVideo" autoplay muted playsinline></video>
+          <canvas id="emotionCanvas" style="display:none"></canvas>
+          <canvas id="postureCanvas" style="display:none"></canvas>
+          <div class="vid-badges">
+            <div class="vbadge" id="emotionBadge"><i class="fas fa-face-meh"></i> <span>Neutral</span></div>
+            <div class="vbadge" id="postureBadge"><i class="fas fa-person"></i> <span>Good</span></div>
+          </div>
+        </div>
+        <div class="transcript-box">
+          <div class="tr-label"><i class="fas fa-microphone"></i>Live Transcript</div>
+          <p id="liveTranscript">Listening for your response…</p>
+        </div>
+      </div>
+      <!-- feedback view (shown after interview) -->
+      <div id="feedbackPanel"></div>
+    </div>
+  </div>
+ 
+  <!-- BOTTOM BAR -->
+  <div class="botbar">
+    <div class="bl">
+      <div class="timer-chip"><i class="fas fa-hourglass-half"></i>Answer: <strong id="answerTime">0:00</strong></div>
+      <div class="vstatus"><div class="vdot" id="vDot"></div><span id="vLabel">Ready to listen</span></div>
+    </div>
+    <button class="recbtn" id="btnRec"><i class="fas fa-microphone"></i></button>
+    <div class="br">
+      <button class="skipbtn" id="btnSkip"><i class="fas fa-forward"></i> Skip</button>
+      <button class="nextbtn" id="btnNext">Next <i class="fas fa-arrow-right"></i></button>
+    </div>
+  </div>
+</div>
+ 
+<!-- END MODAL -->
+<div class="modal" id="endModal">
+  <div class="mbox">
+    <h3>End Interview?</h3>
+    <p>Your session will be saved and an AI feedback report will be generated for your answers.</p>
+    <div class="mbtns">
+      <button class="mghostbtn" id="btnCancelEnd">Continue</button>
+      <button class="mpribtn" id="btnConfirmEnd">End &amp; Get Feedback</button>
+    </div>
+  </div>
+</div>
+ 
+<!-- PROCESSING MODAL -->
+<div class="modal" id="procModal">
+  <div class="mbox">
+    <div class="procspin"></div>
+    <h3>Generating Your Feedback</h3>
+    <p>Analysing your answers, confidence &amp; communication…</p>
+    <div class="procsteps">
+      <div class="pstep done" id="ps1"><i class="fas fa-check-circle"></i> Transcripts saved</div>
+      <div class="pstep act"  id="ps2"><i class="fas fa-spinner fa-spin"></i> Evaluating answers</div>
+      <div class="pstep"      id="ps3"><i class="fas fa-circle"></i> Scoring emotions</div>
+      <div class="pstep"      id="ps4"><i class="fas fa-circle"></i> Communication analysis</div>
+      <div class="pstep"      id="ps5"><i class="fas fa-circle"></i> Building report</div>
+    </div>
+  </div>
+</div>
+ 
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<!-- External JS files -->
+<script src="js/firebase.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/speech.js"></script>
+<script src="js/emotion.js"></script>
+<script src="js/posture.js"></script>
+<script src="js/huggingface.js"></script>
+<script src="js/interview-fix.js"></script>  <!-- last -->
+ 
+<script>
+// ═══════════════════════════════════════════════════════════
+//   AVATAR STATE CONTROLLER
+// ════════════════════════════════════════════════════════
+const AV = {
+  set(state){
+    const img=document.getElementById('avImg');
+    const ring=document.getElementById('avRing');
+    const badge=document.getElementById('avBadge');
+    const wave=document.getElementById('waveBars');
+    if(!img)return;
+    // image class
+    img.className='av-img '+{speaking:'si',thinking:'th',listening:'li',idle:'id'}[state]||'id';
+    // ring class
+    ring.className='av-ring '+{speaking:'rs',thinking:'rt',listening:'rl',idle:''}[state]||'';
+    // badge
+    const lbl={speaking:'Speaking…',thinking:'Thinking…',listening:'Listening…',idle:'Ready'};
+    const col={speaking:'#6366f1cc',thinking:'#f59e0bcc',listening:'#10b981cc',idle:'rgba(0,0,0,.72)'};
+    badge.textContent=lbl[state]||'Ready';
+    badge.style.background=col[state]||'rgba(0,0,0,.72)';
+    // wave bars
+    state==='speaking'?wave.classList.add('on'):wave.classList.remove('on');
+  }
+};
+ 
+// ═══════════════════════════════════════════════════════════
+//   MAIN INTERVIEW CONTROLLER
+// ═══════════════════════════════════════════════════════════
+const IV = {
+  stream:null, user:null, questions:[], idx:0, answers:[],
+  config:{}, totalSec:0, answerSec:0,
+  timerInt:null, answerInt:null,
+  isRec:false, camOn:true, micOn:true,
+  finalTr:'', curTr:'',
+ 
+  /* ── Permission ── */
+  /* ── Permission ── */
+async requestPerm(){
+  const btn=document.getElementById('allowBtn');
+  const err=document.getElementById('permErr');
+
+  btn.disabled=true;
+  btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Requesting…';
+  err.style.display='none';
+
+  try{
+    this.stream=await navigator.mediaDevices.getUserMedia({
+      video:{
+        width:{ideal:1280},
+        height:{ideal:720},
+        facingMode:'user'
+      },
+      audio:{
+        echoCancellation:true,
+        noiseSuppression:true,
+        sampleRate:44100
+      }
+    });
+
+  }catch(e){
+
+    btn.disabled=false;
+    btn.innerHTML='<i class="fas fa-redo"></i> Try Again';
+
+    let msg='Could not access devices. ';
+
+    if(e.name==='NotAllowedError')
+      msg+='Please allow camera & mic in your browser settings.';
+    else if(e.name==='NotFoundError')
+      msg+='No camera or microphone detected.';
+    else if(e.name==='NotReadableError')
+      msg+='Device already in use by another app.';
+    else
+      msg+=e.message;
+
+    err.textContent=msg;
+    err.style.display='block';
+    return;
+  }
+
+  // Hide permission screen
+  document.getElementById('permScreen').style.display='none';
+
+  // Show setup screen
+  const ss=document.getElementById('setupScreen');
+  ss.style.display='flex';
+
+  // Camera preview
+  const pv=document.getElementById('previewVideo');
+
+  if(this.stream.getVideoTracks().length){
+    pv.srcObject=this.stream;
+    document.getElementById('noCamMsg').style.display='none';
+
+    document.querySelector('#ss1 i').className='fas fa-check-circle';
+    document.querySelector('#ss1 i').style.color='#10b981';
+    document.getElementById('ss1t').textContent='Camera ready ✓';
+  }
+
+  // Microphone status
+  if(this.stream.getAudioTracks().length){
+    document.querySelector('#ss2 i').className='fas fa-check-circle';
+    document.querySelector('#ss2 i').style.color='#10b981';
+    document.getElementById('ss2t').textContent='Microphone ready ✓';
+  }
+
+  // AI status
+  setTimeout(()=>{
+    document.querySelector('#ss3 i').className='fas fa-check-circle';
+    document.querySelector('#ss3 i').style.color='#10b981';
+    document.getElementById('ss3t').textContent='AI engine ready ✓';
+
+    // Enable Start Interview button
+    const sb=document.getElementById('startBtn');
+    sb.disabled=false;
+    sb.style.opacity='1';
+
+    sb.onclick=()=>this._startInterview();
+
+  },1000);
+},
+ 
+  /* ── Setup ── */
+  async _runSetup(){
+    const si=(id,icon,color)=>{const el=document.getElementById(id);el.querySelector('i').className='fas '+icon;el.querySelector('i').style.color=color};
+    const st=(id,txt)=>{document.getElementById(id).textContent=txt};
+    const pv=document.getElementById('previewVideo');
+    if(this.stream.getVideoTracks().length){
+      pv.srcObject=this.stream; document.getElementById('noCamMsg').style.display='none';
+      si('ss1','fa-check-circle','#10b981'); st('ss1t','Camera ready ✓');
+    }else{ si('ss1','fa-times-circle','#ef4444'); st('ss1t','No camera found'); }
+    if(this.stream.getAudioTracks().length){ si('ss2','fa-check-circle','#10b981'); st('ss2t','Microphone ready ✓'); }
+    else{ si('ss2','fa-times-circle','#ef4444'); st('ss2t','No microphone found'); }
+    await new Promise(r=>setTimeout(r,900));
+    si('ss3','fa-check-circle','#10b981'); st('ss3t','AI engine ready ✓');
+    const sb=document.getElementById('startBtn');
+    sb.disabled=false; sb.style.opacity='1';
+    sb.onclick=()=>this._startInterview();
+  },
+ 
+  /* ── Start Interview ── */
+  async _startInterview(){
+     this.config={
+     type:document.getElementById('cfgType').value,
+     diff:document.getElementById('cfgDiff').value,
+     num:parseInt(document.getElementById('cfgNum').value),
+     role:document.getElementById('roleSelect').value
+   };
+    // auth
+    if(typeof requireAuth!=='undefined') this.user=await requireAuth('login.html').catch(()=>null);
+    // show app
+    document.getElementById('setupScreen').style.display='none';
+    const app=document.getElementById('app'); app.style.display='flex';
+    // video
+    const vid=document.getElementById('candidateVideo');
+    vid.srcObject=this.stream; vid.play().catch(()=>{});
+    document.getElementById('qTotal').textContent=this.config.num;
+    // detectors
+    if(typeof EmotionDetector!=='undefined'){
+      await EmotionDetector.init(vid,document.getElementById('emotionCanvas'));
+      EmotionDetector.onEmotionUpdate=em=>{
+        document.getElementById('confV').textContent=em.confidence||'--';
+        document.getElementById('eyeV').textContent=em.eyeContact+'%';
+        const b=document.getElementById('emotionBadge');
+        if(b)b.innerHTML=`<i class="fas ${em.icon}"></i> <span>${em.label}</span>`;
+      };
+      EmotionDetector.start();
+    }
+    if(typeof PostureDetector!=='undefined'){
+      await PostureDetector.init(vid,document.getElementById('postureCanvas'));
+      PostureDetector.onPostureUpdate=p=>{
+        document.getElementById('postV').textContent=p.label||'--';
+        const b=document.getElementById('postureBadge');
+        if(b)b.innerHTML=`<i class="fas fa-person"></i> <span>${p.label}</span>`;
+      };
+      PostureDetector.start();
+    }
+    // speech callbacks
+    if(typeof Speech!=='undefined'){
+      Speech.onSpeakStart=()=>AV.set('speaking');
+      Speech.onSpeakEnd=()=>{ AV.set('listening'); setTimeout(()=>this._startAnswerMode(),400); };
+      Speech.onTranscriptUpdate=(fin,int)=>{
+        if(fin)this.finalTr+=' '+fin;
+        this.curTr=(this.finalTr+' '+int).trim();
+        const el=document.getElementById('liveTranscript');
+        if(el)el.textContent=this.curTr||'Listening…';
+      };
+    }
+    // controls
+    this._bindControls();
+    // timer
+    this.timerInt=setInterval(()=>{
+      this.totalSec++;
+      const m=Math.floor(this.totalSec/60),s=this.totalSec%60;
+      document.getElementById('timerEl').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+    },1000);
+    // generate questions
+    document.getElementById('qText').textContent='Generating your personalised questions…';
+    AV.set('thinking');
+    if(typeof HuggingFace!=='undefined'){
+      this.questions=await HuggingFace.generateQuestions({type:this.config.type,difficulty:this.config.diff,role:this.config.role,count:this.config.num}).catch(()=>[]);
+    }
+    if(!this.questions||!this.questions.length) this.questions=this._fallback(this.config.type,this.config.num);
+    this.idx=0;
+    await this._ask();
+  },
+ 
+  /* ── Ask question ── */
+  async _ask(){
+    if(this.idx>=this.questions.length){this._endInterview();return;}
+    const q=this.questions[this.idx];
+    this.finalTr=''; this.curTr=''; this.answerSec=0;
+    document.getElementById('qNum').textContent=this.idx+1;
+    document.getElementById('qCounter').textContent=`Question ${this.idx+1} of ${this.questions.length}`;
+    document.getElementById('qProg').style.width=`${((this.idx+1)/this.questions.length)*100}%`;
+    document.getElementById('liveTranscript').textContent='Listening for your response…';
+    await this._typewrite('qText',q.question||'Tell me about yourself.');
+    if(typeof Speech!=='undefined') Speech.stopListening();
+    AV.set('thinking');
+    await new Promise(r=>setTimeout(r,500));
+    // speak with fallback
+    try{
+      if(typeof Speech!=='undefined') await Speech.speak(q.question,{rate:0.88,pitch:1.0});
+      else throw new Error('no speech');
+    }catch(e){ AV.set('listening'); setTimeout(()=>this._startAnswerMode(),400); }
+  },
+ 
+  /* ── Answer mode ── */
+  _startAnswerMode(){
+    AV.set('listening');
+    document.getElementById('vDot').classList.add('on');
+    document.getElementById('vLabel').textContent='Recording your answer…';
+    if(typeof Speech!=='undefined') Speech.startListening();
+    clearInterval(this.answerInt);
+    this.answerSec=0;
+    this.answerInt=setInterval(()=>{
+      this.answerSec++;
+      const m=Math.floor(this.answerSec/60),s=this.answerSec%60;
+      document.getElementById('answerTime').textContent=m+':'+String(s).padStart(2,'0');
+      if(this.answerSec>=180){clearInterval(this.answerInt);this._submitNext();}
+    },1000);
+  },
+ 
+  /* ── Submit & next ── */
+  async _submitNext(){
+    clearInterval(this.answerInt);
+    if(typeof Speech!=='undefined') Speech.stopListening();
+    document.getElementById('vDot').classList.remove('on');
+    document.getElementById('vLabel').textContent='Ready to listen';
+    AV.set('idle');
+    const answer=this.curTr.trim()||'No answer provided.';
+    const question=this.questions[this.idx];
+    let evaluation={score:50,feedback:'Keep practising!',strengths:[],improvements:[]};
+    if(typeof HuggingFace!=='undefined'){
+      evaluation=await HuggingFace.evaluateAnswer(question.question,answer,this.config.type).catch(()=>evaluation);
+    }else{ evaluation=this._heuristic(answer); }
+    this.answers.push({question:question.question,category:question.category||'general',answer,duration:this.answerSec,evaluation,timestamp:Date.now()});
+    this.idx++;
+    await this._ask();
+  },
+ 
+  /* ── Skip ── */
+  _skip(){
+    this.answers.push({question:this.questions[this.idx]?.question||'',category:'general',answer:'Skipped',duration:0,evaluation:{score:0,feedback:'Skipped.',strengths:[],improvements:[]},timestamp:Date.now()});
+    this.idx++; clearInterval(this.answerInt);
+    if(typeof Speech!=='undefined') Speech.stopListening();
+    this._ask();
+  },
+ 
+  /* ── Controls ── */
+  _bindControls(){
+    document.getElementById('btnNext').onclick=()=>this._submitNext();
+    document.getElementById('btnSkip').onclick=()=>this._skip();
+    document.getElementById('btnEnd').onclick=()=>document.getElementById('endModal').classList.add('on');
+    document.getElementById('btnCancelEnd').onclick=()=>document.getElementById('endModal').classList.remove('on');
+    document.getElementById('btnConfirmEnd').onclick=()=>this._endInterview();
+    const rb=document.getElementById('btnRec');
+    rb.onclick=()=>{
+      this.isRec=!this.isRec;
+      if(this.isRec){rb.classList.add('rec');rb.innerHTML='<i class="fas fa-stop"></i>';if(typeof Speech!=='undefined')Speech.startListening();document.getElementById('vDot').classList.add('on');document.getElementById('vLabel').textContent='Recording…';}
+      else{rb.classList.remove('rec');rb.innerHTML='<i class="fas fa-microphone"></i>';if(typeof Speech!=='undefined')Speech.stopListening();document.getElementById('vDot').classList.remove('on');document.getElementById('vLabel').textContent='Ready to listen';}
+    };
+    document.getElementById('btnCam').onclick=()=>{
+      this.camOn=!this.camOn;
+      this.stream?.getVideoTracks().forEach(t=>t.enabled=this.camOn);
+      document.querySelector('#btnCam i').className='fas '+(this.camOn?'fa-video':'fa-video-slash');
+    };
+    document.getElementById('btnMicT').onclick=()=>{
+      this.micOn=!this.micOn;
+      this.stream?.getAudioTracks().forEach(t=>t.enabled=this.micOn);
+      document.querySelector('#btnMicT i').className='fas '+(this.micOn?'fa-microphone':'fa-microphone-slash');
+    };
+  },
+ 
+  /* ── End Interview ── */
+  async _endInterview(){
+    document.getElementById('endModal').classList.remove('on');
+    clearInterval(this.timerInt); clearInterval(this.answerInt);
+    if(typeof Speech!=='undefined'){Speech.stopSpeaking();Speech.stopListening();}
+    if(typeof EmotionDetector!=='undefined') EmotionDetector.stop();
+    if(typeof PostureDetector!=='undefined') PostureDetector.stop();
+    if(this.stream) this.stream.getTracks().forEach(t=>t.stop());
+    AV.set('idle');
+    document.getElementById('procModal').classList.add('on');
+    const avgScore=this.answers.length?Math.round(this.answers.reduce((s,a)=>s+(a.evaluation?.score||0),0)/this.answers.length):45;
+    const emotionMetrics=(typeof EmotionDetector!=='undefined')?EmotionDetector.getAverageMetrics():{confidenceScore:60,eyeContact:65};
+    const postureScore=(typeof PostureDetector!=='undefined')?PostureDetector.getAverageScore():70;
+    await this._ps('ps2','ps3',600);
+    let summary={};
+    if(typeof HuggingFace!=='undefined'){
+      summary=await HuggingFace.generateReportSummary({answers:this.answers,type:this.config.type,role:this.config.role,avgScore}).catch(()=>({}));
+    }
+    await this._ps('ps3','ps4',500);
+    const commScore=this._commScore();
+    await this._ps('ps4','ps5',500);
+    const report={config:this.config,answers:this.answers,scores:{overall:avgScore,technical:this.config.type==='technical'?avgScore:Math.round(avgScore*.9),confidence:emotionMetrics.confidenceScore||60,communication:commScore,bodyLanguage:postureScore},emotions:emotionMetrics,summary,duration:this.totalSec,date:new Date().toISOString(),type:this.config.type,difficulty:this.config.diff};
+    const uid=this.user?.uid||'demo_user';
+    let reportId='local_'+Date.now();
+    if(typeof FirebaseDB!=='undefined'){
+  reportId=await FirebaseDB.saveReport(uid,report).catch(()=>reportId);
+  await FirebaseDB.saveInterview(uid,{
+    reportId,
+    type:        this.config.type,
+    difficulty:  this.config.diff,
+    role:        this.config.role||'',
+    score:       avgScore,
+    duration:    this.totalSec,
+    questionsAnswered: this.answers.length,
+    createdAt:   new Date().toISOString(),
+    skills:{
+      technical:     report.scores.technical||avgScore,
+      communication: commScore,
+      confidence:    emotionMetrics.confidenceScore||60,
+      bodyLanguage:  postureScore,
+      clarity:       Math.round((commScore+avgScore)/2),
+      depth:         Math.round(avgScore*0.9)
+    },
+    communication:{
+      speakingSpeed: commScore,
+      clarity:       Math.round((commScore+avgScore)/2),
+      fluency:       Math.round(commScore*0.95),
+      hesitation:    Math.max(10,100-commScore),
+      confidence:    emotionMetrics.confidenceScore||60
+    },
+    emotions:{
+      confident: emotionMetrics.confidenceScore||45,
+      neutral:   Math.round((100-(emotionMetrics.confidenceScore||45))*0.5),
+      nervous:   Math.max(5,Math.round((100-avgScore)*0.25)),
+      engaged:   Math.min(30,Math.round(avgScore*0.2))
+    },
+    confidenceScore: emotionMetrics.confidenceScore||60
+  }).catch(()=>{});
+}
+    await this._ps('ps5',null,600);
+    document.getElementById('procModal').classList.remove('on');
+    // Show inline feedback on right panel
+    this._showFeedback(report,reportId);
+  },
+ 
+  /* ── Inline Feedback ── */
+  _showFeedback(report,reportId){
+    document.getElementById('candidateView').style.display='none';
+    const fp=document.getElementById('feedbackPanel');
+    fp.style.display='flex';
+    const sc=report.scores;
+    const col=v=>v>=80?'#10b981':v>=60?'#f59e0b':'#ef4444';
+    const sum=report.summary||{};
+    const strs=(sum.strengths||[]).map(s=>`<li>${s}</li>`).join('')||'<li>Good effort throughout</li>';
+    const wkns=(sum.weaknesses||[]).map(w=>`<li>${w}</li>`).join('')||'<li>Keep practising for improvement</li>';
+    const recs=(sum.recommendations||[]).map(r=>`<li>${r}</li>`).join('')||'<li>Practice the STAR method</li>';
+    const qfbs=this.answers.slice(0,5).map((a,i)=>`
+      <div class="qfb-item">
+        <div class="qfb-q">Q${i+1}: ${a.question}</div>
+        <span class="qfb-score" style="background:${col(a.evaluation?.score||0)}22;color:${col(a.evaluation?.score||0)}">${a.evaluation?.score||0}/100</span>
+        <div class="qfb-fb">${a.evaluation?.feedback||'Keep practising!'}</div>
+      </div>`).join('');
+    fp.innerHTML=`
+      <div style="font-size:.82rem;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--p)"><i class="fas fa-chart-bar"></i> Your Interview Feedback</div>
+      <div class="fb-score-row">
+        <div class="fb-score-card"><div class="fbs-val" style="color:${col(sc.overall)}">${sc.overall}</div><div class="fbs-lbl">Overall</div></div>
+        <div class="fb-score-card"><div class="fbs-val" style="color:${col(sc.confidence)}">${sc.confidence}</div><div class="fbs-lbl">Confidence</div></div>
+        <div class="fb-score-card"><div class="fbs-val" style="color:${col(sc.communication)}">${sc.communication}</div><div class="fbs-lbl">Communication</div></div>
+        <div class="fb-score-card"><div class="fbs-val" style="color:${col(sc.bodyLanguage)}">${sc.bodyLanguage}</div><div class="fbs-lbl">Body Language</div></div>
+      </div>
+      <div class="fb-section"><h4 class="green"><i class="fas fa-thumbs-up"></i> Strengths</h4><ul>${strs}</ul></div>
+      <div class="fb-section"><h4 class="red"><i class="fas fa-thumbs-down"></i> Areas to Improve</h4><ul>${wkns}</ul></div>
+      <div class="fb-section"><h4 class="purple"><i class="fas fa-lightbulb"></i> Recommendations</h4><ul>${recs}</ul></div>
+      <div class="fb-section"><h4 style="color:var(--amber)"><i class="fas fa-list"></i> Answer Breakdown</h4>${qfbs}</div>
+      <button class="view-full-btn" onclick="window.location.href='report.html?id=${reportId}'"><i class="fas fa-file-lines"></i> View Full Report</button>
+    `;
+    // update left panel to show completion
+    document.getElementById('qText').textContent='Interview complete! Great job 🎉';
+    AV.set('idle');
+    document.getElementById('waveBars').classList.remove('on');
+  },
+ 
+  /* ── Helpers ── */
+  async _ps(doneId,nextId,delay){
+    const d=document.getElementById(doneId);
+    if(d){d.className='pstep done';d.innerHTML='<i class="fas fa-check-circle"></i> '+d.textContent.replace(/^\S+\s/,'');}
+    if(nextId){const n=document.getElementById(nextId);if(n){n.className='pstep act';n.innerHTML='<i class="fas fa-spinner fa-spin"></i> '+n.textContent.replace(/^\S+\s/,'');}}
+    await new Promise(r=>setTimeout(r,delay));
+  },
+  _commScore(){
+    if(!this.answers.length)return 55;
+    const s=this.answers.map(a=>{const w=a.answer.split(/\s+/).length;const wpm=(w/(a.duration||1))*60;return Math.round(((wpm>100&&wpm<180?90:wpm>80?75:60)+(w>50?85:w>20?70:50))/2);});
+    return Math.round(s.reduce((a,b)=>a+b,0)/s.length);
+  },
+  _heuristic(answer){
+    const w=answer.trim().split(/\s+/).length;
+    const hasEx=/for example|such as|instance|specifically|when i/i.test(answer);
+    let score=40; if(w>50)score+=15; if(w>100)score+=10; if(hasEx)score+=15; score=Math.min(score,90);
+    return{score,relevance:score-5,clarity:score-8,depth:score-12,feedback:w<30?'Your answer was brief — expand with specific examples.':hasEx?'Good use of examples. Structure with beginning, middle, conclusion.':'Solid answer. Add concrete examples to strengthen it.',strengths:[w>80?'Detailed response':'Clear answer'],improvements:[!hasEx?'Include specific examples':'Quantify achievements']};
+  },
+  async _typewrite(id,text){
+    const el=document.getElementById(id); if(!el)return;
+    el.textContent='';
+    const sp=Math.max(18,Math.min(45,1800/text.length));
+    for(const c of text){el.textContent+=c;await new Promise(r=>setTimeout(r,sp));}
+  },
+  _fallback(type,count){
+    const banks={
+      hr:[
+        {question:'Tell me about yourself and your professional background.',category:'behavioral'},
+        {question:'What is your greatest professional strength, and how has it helped you?',category:'behavioral'},
+        {question:'Describe a challenging situation you faced at work and how you handled it.',category:'situational'},
+        {question:'Where do you see yourself in five years?',category:'behavioral'},
+        {question:'Why are you interested in this role?',category:'behavioral'},
+        {question:'Tell me about a time you worked successfully in a team.',category:'behavioral'},
+        {question:'How do you handle pressure and tight deadlines?',category:'situational'},
+        {question:'What motivates you in your work?',category:'behavioral'},
+        {question:'Tell me about a mistake you made and what you learned from it.',category:'behavioral'},
+        {question:'How do you prioritise tasks when you have multiple deadlines?',category:'situational'}
+      ],
+      technical:[
+        {question:'Explain Object-Oriented Programming and its four main principles.',category:'technical'},
+        {question:'What is the difference between REST and GraphQL APIs?',category:'technical'},
+        {question:'How would you optimise a slow database query?',category:'technical'},
+        {question:'Explain Big O notation with examples.',category:'technical'},
+        {question:'What are design patterns? Name three you have used.',category:'technical'},
+        {question:'How does garbage collection work in modern programming languages?',category:'technical'},
+        {question:'When would you use SQL vs NoSQL databases?',category:'technical'},
+        {question:'What is CI/CD and why is it important?',category:'technical'},
+        {question:'How would you debug a production issue with no logs?',category:'technical'},
+        {question:'What are the trade-offs of microservices architecture?',category:'technical'}
+      ],
+      aptitude:[
+        {question:'If a train travels 120 km at 60 km/h then 80 km at 40 km/h, what is the average speed?',category:'aptitude'},
+        {question:'A shop gives 20% discount, plus a customer coupon of 10% off. What is the effective total discount?',category:'aptitude'},
+        {question:'If 5 machines make 5 widgets in 5 minutes, how long for 100 machines to make 100 widgets?',category:'aptitude'},
+        {question:'Find the next number: 2, 6, 12, 20, 30, ___',category:'aptitude'},
+        {question:'A man walks 3 km north then 4 km east. How far is he from the start?',category:'aptitude'},
+        {question:'What comes next in the series: A, C, F, J, O, ___?',category:'aptitude'},
+        {question:'If all Bloops are Razzles and all Razzles are Lazzles, are all Bloops definitely Lazzles?',category:'aptitude'},
+        {question:'Find the odd one out: 121, 144, 169, 196, 200, 225',category:'aptitude'},
+        {question:'A project needs 10 people × 8 hrs × 5 days. If only 8 people available, how many days?',category:'aptitude'},
+        {question:'How many unique paths from top-left to bottom-right of a 3×3 grid, moving only right or down?',category:'aptitude'}
+      ]
+    };
+    if(type==='mixed'){const all=[...banks.hr.slice(0,4),...banks.technical.slice(0,3),...banks.aptitude.slice(0,3)];return this._shuffle(all).slice(0,count);}
+    const pool=banks[type]||banks.hr;
+    return this._shuffle(pool).slice(0,count);
+  },
+  _shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+};
+ 
+// ── Boot ─────────────────────────────────────
+document.addEventListener('DOMContentLoaded',()=>{
+  if(typeof Speech!=='undefined') Speech.init?.();
+  document.getElementById('allowBtn').addEventListener('click',()=>IV.requestPerm());
+});
+</script>
+</body>
+</html>

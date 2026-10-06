@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Report — InterveuX</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body class="dashboard-body">
+    <div class="bg-gradient-animated">
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+    </div>
+
+    <div class="report-container">
+        <div class="report-header-bar">
+            <a href="dashboard.html" class="btn-ghost btn-sm">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Dashboard</span>
+            </a>
+            <div class="report-header-actions">
+                <button class="btn-outline btn-sm" id="downloadPDF">
+                    <i class="fas fa-download"></i>
+                    <span>Download PDF</span>
+                </button>
+                <button class="btn-outline btn-sm" id="shareReport">
+                    <i class="fas fa-share-alt"></i>
+                    <span>Share</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="report-content" id="reportContent">
+            <!-- Report Header -->
+            <div class="report-title-card glass-card">
+                <div class="report-title-left">
+                    <h1>Interview Report</h1>
+                    <p class="report-meta">
+                        <span id="reportDate">--</span> • 
+                        <span id="reportType">--</span> • 
+                        <span id="reportDifficulty">--</span>
+                    </p>
+                </div>
+                <div class="report-overall-score">
+                    <div class="score-circle" id="overallScoreCircle">
+                        <svg viewBox="0 0 120 120">
+                            <circle cx="60" cy="60" r="52" class="score-bg"/>
+                            <circle cx="60" cy="60" r="52" class="score-progress" id="scoreProgress"/>
+                        </svg>
+                        <div class="score-value" id="overallScore">0</div>
+                        <div class="score-label">Overall</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Score Breakdown -->
+            <div class="report-scores-grid">
+                <div class="score-card glass-card">
+                    <div class="score-icon blue"><i class="fas fa-code"></i></div>
+                    <div class="score-details">
+                        <h4>Technical Score</h4>
+                        <div class="score-bar-wrapper">
+                            <div class="score-bar"><div class="score-fill" id="technicalFill" style="width:0%"></div></div>
+                            <span class="score-percent" id="technicalScore">0%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="score-card glass-card">
+                    <div class="score-icon green"><i class="fas fa-face-smile"></i></div>
+                    <div class="score-details">
+                        <h4>Confidence Score</h4>
+                        <div class="score-bar-wrapper">
+                            <div class="score-bar"><div class="score-fill" id="confidenceFill" style="width:0%"></div></div>
+                            <span class="score-percent" id="confidenceScoreReport">0%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="score-card glass-card">
+                    <div class="score-icon purple"><i class="fas fa-comments"></i></div>
+                    <div class="score-details">
+                        <h4>Communication</h4>
+                        <div class="score-bar-wrapper">
+                            <div class="score-bar"><div class="score-fill" id="communicationFill" style="width:0%"></div></div>
+                            <span class="score-percent" id="communicationScore">0%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="score-card glass-card">
+                    <div class="score-icon orange"><i class="fas fa-person"></i></div>
+                    <div class="score-details">
+                        <h4>Body Language</h4>
+                        <div class="score-bar-wrapper">
+                            <div class="score-bar"><div class="score-fill" id="bodyFill" style="width:0%"></div></div>
+                            <span class="score-percent" id="bodyScore">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="report-charts-grid">
+                <div class="chart-card glass-card">
+                    <h3>Emotion Timeline</h3>
+                    <canvas id="emotionTimelineChart"></canvas>
+                </div>
+                <div class="chart-card glass-card">
+                    <h3>Answer Quality per Question</h3>
+                    <canvas id="answerQualityChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Question-by-Question Analysis -->
+            <div class="questions-analysis glass-card">
+                <h3>Question-by-Question Analysis</h3>
+                <div class="questions-list" id="questionsAnalysisList">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Strengths & Weaknesses -->
+            <div class="sw-grid">
+                <div class="sw-card glass-card strengths">
+                    <h3><i class="fas fa-thumbs-up"></i> Strengths</h3>
+                    <ul id="strengthsList">
+                        <li>Loading...</li>
+                    </ul>
+                </div>
+                <div class="sw-card glass-card weaknesses">
+                    <h3><i class="fas fa-thumbs-down"></i> Areas for Improvement</h3>
+                    <ul id="weaknessesList">
+                        <li>Loading...</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- AI Recommendations -->
+            <div class="recommendations-card glass-card">
+                <h3><i class="fas fa-lightbulb"></i> AI Recommendations</h3>
+                <div class="recommendations-list" id="recommendationsList">
+                    <p>Loading recommendations...</p>
+                </div>
+            </div>
+
+            <!-- Career Roadmap -->
+            <div class="roadmap-card glass-card">
+                <h3><i class="fas fa-road"></i> Personalized Improvement Roadmap</h3>
+                <div class="roadmap-timeline" id="roadmapTimeline">
+                    <div class="roadmap-item">
+                        <div class="roadmap-week">Week 1-2</div>
+                        <div class="roadmap-content">
+                            <h4>Foundation Building</h4>
+                            <p>Focus on core communication skills and confidence building exercises.</p>
+                        </div>
+                    </div>
+                    <div class="roadmap-item">
+                        <div class="roadmap-week">Week 3-4</div>
+                        <div class="roadmap-content">
+                            <h4>Technical Depth</h4>
+                            <p>Deep dive into technical concepts and structured answer frameworks.</p>
+                        </div>
+                    </div>
+                    <div class="roadmap-item">
+                        <div class="roadmap-week">Week 5-6</div>
+                        <div class="roadmap-content">
+                            <h4>Mock Practice</h4>
+                            <p>Intensive mock interviews with increasing difficulty levels.</p>
+                        </div>
+                    </div>
+                    <div class="roadmap-item">
+                        <div class="roadmap-week">Week 7-8</div>
+                        <div class="roadmap-content">
+                            <h4>Interview Ready</h4>
+                            <p>Final polishing, company-specific preparation, and confidence mastery.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Compatibility SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="js/firebase.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/interview-fix.js"></script>
+    <script src="js/report.js"></script>
+</body>
+</html>
